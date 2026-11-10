@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaizen — Every Search Becomes a Route</title>
+<meta name="description" content="One goal in. A path out. Kaizen turns research into a route of small, finishable steps.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kaizen">
+<meta property="og:title" content="Kaizen — Every Search Becomes a Route">
+<meta property="og:description" content="The browser for entrepreneurs. One goal in. A path out — the answer, the pros and cons, and the exact next step.">
+<meta property="og:image" content="poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@kaizenbrowser">
+<meta name="twitter:title" content="Kaizen — Every Search Becomes a Route">
+<meta name="twitter:description" content="The browser for entrepreneurs. One goal in. A path out — the answer, the pros and cons, and the exact next step.">
+<meta name="twitter:image" content="poster.jpg">
+<meta name="theme-color" content="#050507">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p50:#FAF9F5;--p100:#F4F1E7;--p200:#EFE5C8;--p300:#EBD798;--p400:#E1C365;--p500:#C9A227;
+  --p600:#B39123;--p700:#91751C;--p800:#735D16;--p900:#524519;--p950:#342E18;
+  --n50:#FAFAFA;--n100:#F3F3F1;--n200:#E7E6E4;--n300:#D4D3CE;--n400:#A9A69E;--n500:#8C887D;
+  --n600:#726E65;--n700:#59574F;--n800:#413F3A;--n900:#2B2A26;--n950:#1B1A18;
+  --bg:#050507;--panel:rgba(20,20,26,.66);--line:rgba(235,215,152,.16);
+  --ease-out:cubic-bezier(.16,1,.3,1);--ease-in-out:cubic-bezier(.65,0,.35,1);
+  --r-sm:.25rem;--r-md:.5rem;--r-lg:.75rem;--r-xl:1rem;
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.45),0 4px 6px -4px rgba(0,0,0,.4);
+  --font:"Zen Kaku Gothic New","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-display:"Fuji Fantastic","Yuji Syuku","Zen Kaku Gothic New",serif;
+}
+
+@font-face{font-family:"Fuji Fantastic";src:url("fuji-fantastic.otf") format("opentype");font-weight:700;font-style:normal;font-display:swap}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;color-scheme:dark;scrollbar-width:thin;scrollbar-color:var(--p700) #0a0a0d}
+body{background:var(--bg);color:var(--n100);font-family:var(--font);line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--p500);color:#0a0a0c}
+::-webkit-scrollbar{width:9px}
+::-webkit-scrollbar-track{background:#0a0a0d}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--p500),var(--p800));border-radius:99px;border:2px solid #0a0a0d}
+::-webkit-scrollbar-thumb:hover{background:var(--p400)}
+.skip{position:absolute;left:-999px;top:0;background:var(--p500);color:#0a0a0c;padding:.6rem 1rem;z-index:60;border-radius:0 0 var(--r-md) 0;font-weight:600}
+.skip:focus{left:0}
+a{color:var(--p300)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--p400);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:var(--font-display);font-weight:700;line-height:1.12;text-wrap:balance;letter-spacing:.01em}
+.wrap{width:min(1120px,92vw);margin-inline:auto}
+/* header */
+.hdr{position:fixed;inset:0 0 auto 0;z-index:50;transition:background-color .35s var(--ease-out),border-color .35s var(--ease-out);border-bottom:1px solid transparent}
+.hdr.scrolled{background:rgba(5,5,8,.78);backdrop-filter:blur(14px);border-color:var(--line)}
+.hdr-in{display:flex;align-items:center;gap:1.4rem;padding:.85rem 0}
+.brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--n50);font-weight:700;letter-spacing:.24em;font-size:.86rem}
+.brand img{border-radius:8px}
+.nav{display:flex;gap:1.3rem;margin-left:auto}
+.nav a{color:var(--n300);text-decoration:none;font-size:.9rem;transition:color .2s var(--ease-out)}
+.nav a:hover{color:var(--p300)}
+.socials{display:flex;gap:.55rem;margin-left:1.2rem}
+.socials a{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;color:var(--n200);transition:color .2s var(--ease-out),border-color .2s var(--ease-out),transform .2s var(--ease-out)}
+.socials a:hover{color:var(--p300);border-color:var(--p500);transform:translateY(-2px)}
+@media (max-width:760px){.nav{display:none}.socials{margin-left:auto}}
+/* scrub stage */
+.scrub{position:relative;height:440vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage .veil{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 42%,transparent 40%,rgba(3,3,5,.55) 100%)}
+.poster{display:none;width:100%;height:100%;object-fit:cover}
+.act{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 6vw;opacity:0;pointer-events:none;will-change:opacity,transform}
+.act.on{pointer-events:auto}
+.kicker{letter-spacing:.34em;font-size:.78rem;font-weight:700;color:var(--p400);text-transform:uppercase;margin-bottom:1.1rem}
+.act h1,.act h2{font-size:clamp(2.3rem,6.4vw,4.6rem);font-weight:700;color:var(--n50);max-width:15ch}
+.act p{margin-top:1.1rem;font-size:clamp(1rem,2vw,1.3rem);color:var(--n200);max-width:52ch}
+.act .cta{margin-top:2rem}
+.btn{display:inline-block;background:var(--p500);color:#0b0b0d;font-weight:700;text-decoration:none;padding:.9rem 1.7rem;border-radius:999px;border:0;cursor:pointer;font-size:1rem;transition:background-color .2s var(--ease-out),transform .2s var(--ease-out)}
+.btn:hover{background:var(--p400);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--p300);border:1px solid var(--p700)}
+.btn.ghost:hover{border-color:var(--p400);color:var(--p200)}
+
+/* sections */
+section.block{padding:7rem 0;scroll-margin-top:84px}
+.eyebrow{letter-spacing:.3em;font-size:.75rem;font-weight:700;color:var(--p400);text-transform:uppercase}
+.block h2{font-size:clamp(1.9rem,4.4vw,3rem);color:var(--n50);margin:.7rem 0 1rem;max-width:22ch}
+.lede{font-size:1.15rem;color:var(--n300);max-width:62ch}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
+.rv.in{opacity:1;transform:none}
+.grid{display:grid;gap:1.2rem;margin-top:3rem}
+.grid.c3{grid-template-columns:repeat(3,1fr)}
+.grid.c2{grid-template-columns:repeat(2,1fr)}
+@media (max-width:860px){.grid.c3,.grid.c2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-xl);padding:1.7rem;backdrop-filter:blur(10px)}
+.card h3{color:var(--n50);font-size:1.12rem;margin-bottom:.5rem}
+.card p{color:var(--n300);font-size:.97rem}
+.card .ic{font-size:1.5rem;display:block;margin-bottom:.8rem}
+/* answer mock */
+.mock{background:rgba(10,10,14,.82);border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--sh-lg);padding:1.8rem;margin-top:3rem}
+.mock .q{font-size:1.05rem;color:var(--n100)}
+.mock .q b{color:var(--p300)}
+.mock h4{letter-spacing:.22em;font-size:.72rem;color:var(--p400);text-transform:uppercase;margin:1.4rem 0 .5rem}
+.mock p,.mock ul li{color:var(--n200);font-size:.98rem}
+.mock ul{list-style:none}
+.mock ul li{padding:.34rem 0 .34rem 1.5rem;position:relative}
+.mock ul li::before{content:"";position:absolute;left:0;top:.72em;width:.55rem;height:.55rem;border-radius:2px}
+.mock ul li.pro::before{background:#7BC47F}
+.mock ul li.con::before{background:#E0655F}
+.mock ul li.step::before{background:var(--p400);border-radius:50%}
+.mock .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 2.4rem}
+@media (max-width:760px){.mock .cols{grid-template-columns:1fr}}
+/* quote */
+.quote{padding:6rem 0;text-align:center}
+.quote blockquote{font-family:"Fuji Fantastic","Yuji Syuku",Georgia,serif;font-size:clamp(1.5rem,3.6vw,2.4rem);color:var(--n50);max-width:26ch;margin-inline:auto;line-height:1.35;text-wrap:balance}
+.quote cite{display:block;margin-top:1.2rem;font-style:normal;color:var(--n400);letter-spacing:.14em;font-size:.82rem;text-transform:uppercase}
+/* waitlist */
+.wl-box{background:linear-gradient(160deg,rgba(201,162,39,.12),rgba(20,20,26,.7) 55%);border:1px solid var(--line);border-radius:var(--r-xl);padding:2.6rem;text-align:center}
+.wl-box h2{margin-inline:auto}
+.wl{display:flex;gap:.7rem;justify-content:center;margin-top:2rem;flex-wrap:wrap}
+.wl label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wl input{background:rgba(5,5,8,.8);border:1px solid var(--n700);color:var(--n50);border-radius:999px;padding:.9rem 1.3rem;font-size:1rem;min-width:min(340px,80vw);font-family:var(--font)}
+.wl input::placeholder{color:var(--n500)}
+.wl-msg{margin-top:1rem;color:var(--p300);min-height:1.5em;font-size:.95rem}
+/* footer */
+footer{border-top:1px solid var(--line);padding:3rem 0 3.4rem;color:var(--n400);font-size:.92rem}
+.ftr{display:flex;flex-wrap:wrap;gap:1.4rem;align-items:center;justify-content:space-between}
+.ftr .socials{margin-left:0}
+/* layout variants */
+.v-split .act{align-items:flex-start;text-align:left;padding-left:8vw}
+.v-split .act h1,.v-split .act h2{max-width:13ch}
+.v-split .act p{max-width:44ch}
+.v-story .act{align-items:flex-start;text-align:left;padding-left:8vw;justify-content:flex-end;padding-bottom:16vh}
+.v-zen .act h1{font-family:"Fuji Fantastic","Yuji Syuku",cursive;font-weight:700;letter-spacing:.04em;font-size:clamp(3.2rem,10vw,7.2rem);color:var(--n50)}
+.principles{list-style:none;margin-top:2.6rem}
+.principles li{display:flex;gap:1.4rem;padding:1.3rem 0;border-bottom:1px solid var(--line);align-items:baseline}
+.principles .n{font-family:"Yuji Syuku",Georgia,serif;color:var(--p400);font-size:1.3rem;min-width:2.2rem}
+.principles h3{color:var(--n50);font-size:1.15rem}
+.principles p{color:var(--n300)}
+.route{list-style:none;margin-top:2.4rem;counter-reset:step}
+.route li{display:flex;gap:1.1rem;padding:1.05rem 0;border-bottom:1px solid var(--line);color:var(--n200)}
+.route li::before{counter-increment:step;content:counter(step);display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--p600);color:var(--p300);font-size:.85rem;font-weight:700}
+.route li.done{color:var(--n400)}
+.route li.done::before{background:var(--p500);color:#0b0b0d;border-color:var(--p500)}
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .scrub{height:auto}
+  .stage{position:static;height:auto;overflow:visible}
+  .stage canvas,.stage .veil{display:none}
+  .poster{display:block;height:52vh}
+  .act{position:static;opacity:1;pointer-events:auto;padding:3.2rem 6vw;transform:none}
+  .rv{opacity:1;transform:none;transition:none}
+  .btn,.socials a,.nav a{transition:none}
+}
+
+.act .display{font-family:var(--font-display);font-size:clamp(2.3rem,6.4vw,4.6rem);font-weight:700;color:var(--n50);max-width:15ch;line-height:1.12;letter-spacing:.01em}
+.v-split .act .display{max-width:13ch}
+</style>
+</head>
+<body class="">
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr"><div class="wrap hdr-in">
+<a class="brand" href="#top" aria-label="Kaizen home"><img src="logo.webp" alt="" width="34" height="34">KAIZEN</a>
+<nav class="nav" aria-label="Page"><a href="#how">The Route</a><a href="#features">Features</a><a href="#waitlist">Waitlist</a></nav>
+<div class="socials"><a href="https://x.com/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on X (Twitter)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.3 22h-6.3l-4.9-6.4L6.5 22H3.4l7.3-8.3L1.5 2h6.4l4.4 5.9L18.9 2zm-1.1 18h1.7L7 3.9H5.2L17.8 20z"/></svg></a><a href="https://www.instagram.com/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on Instagram"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.25" fill="currentColor" stroke="none"/></svg></a><a href="https://www.youtube.com/@kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on YouTube"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.5 12 4.5 12 4.5s-7 0-8.9.6A3 3 0 0 0 1 7.2 31.3 31.3 0 0 0 .5 12 31.3 31.3 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.6 8.9.6 8.9.6s7 0 8.9-.6a3 3 0 0 0 2.1-2.1A31.3 31.3 0 0 0 23.5 12 31.3 31.3 0 0 0 23 7.2zM9.8 15.5v-7l6 3.5-6 3.5z"/></svg></a><a href="https://www.reddit.com/user/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on Reddit"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm5.1 12.3a3.9 3.9 0 0 1-2 3.4 10.6 10.6 0 0 1-6.2 0 3.9 3.9 0 0 1-2-3.4.9.9 0 0 1 .9-1 1 1 0 0 1 .5.6 8.3 8.3 0 0 0 3.5.8l.7-3.3a.4.4 0 0 1 .3-.3l2.4-.5a1.2 1.2 0 1 1 .2.5l-2.2.5-.6 2.9a8.5 8.5 0 0 0 3.6-.8 1 1 0 0 1 .5-.6.9.9 0 0 1 .9.9zM8.9 12.4a1.4 1.4 0 1 1-1.4 1.4 1.4 1.4 0 0 1 1.4-1.4zm6.3 2.9a3.4 3.4 0 0 1-3.2 1.2 3.4 3.4 0 0 1-3.2-1.2.3.3 0 0 1 .4-.4 4.2 4.2 0 0 0 2.8.9 4.2 4.2 0 0 0 2.8-.9.3.3 0 1 1 .4.4zm-.1-2.9a1.4 1.4 0 1 1-1.4 1.4 1.4 1.4 0 0 1 1.4-1.4z"/></svg></a><a href="https://www.indiehackers.com/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on Indie Hackers"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16.5" text-anchor="middle" font-size="9.5" font-weight="700" font-family="Arial,sans-serif">IH</text></svg></a></div>
+</div></header>
+<main id="main">
+<section class="scrub" id="top" aria-label="Kaizen introduction">
+<div class="stage">
+<canvas id="seq" role="img" aria-label="Streams of golden light converging into one bright route as you scroll"></canvas>
+<img class="poster" src="poster.jpg" alt="" width="960" height="540">
+<div class="veil" aria-hidden="true"></div>
+<div class="act" data-from="-0.08" data-to="0.3"><h1>Every search becomes a route.</h1><p>Tell it the outcome. It draws the way.</p></div>
+<div class="act" data-from="0.38" data-to="0.62"><p class="display">One goal in. A path out.</p></div>
+<div class="act" data-from="0.7" data-to="1.08"><p class="display">Follow the line. Do the step. Arrive.</p><a class="btn cta" href="#waitlist">Join the Waitlist</a></div>
+</div></section>
+
+<section class="block" id="how"><div class="wrap">
+<p class="eyebrow rv">The route</p>
+<h2 class="rv">One goal in. A path out.</h2>
+<p class="lede rv">Tell Kaizen the outcome — “launch my store”, “file my taxes”, “hire my first designer” — and it turns the searching, comparing, and second-guessing into a route you can simply walk.</p>
+<div class="mock rv">
+<p class="q">Your goal: <b>Launch my online store</b></p>
+<ol class="route">
+<li class="done">Pick the platform — Kaizen compared three, with costs, and picked the one that fits a solo founder</li>
+<li class="done">Register the store name and connect payments</li>
+<li>Add your first five products — photos, prices, one-line descriptions</li>
+<li>Set shipping rates and a returns line you can actually honour</li>
+<li>Share the link where your audience already is</li>
+</ol>
+<p style="margin-top:1.2rem;color:var(--n400);font-size:.92rem">Every step opens with its answer, its pros and cons, and the exact clicks — researched when you reach it, not dumped on you at the start.</p>
+</div>
+</div></section>
+<section class="block" id="features" style="padding-top:0"><div class="wrap">
+<p class="eyebrow rv">Under the hood</p>
+<h2 class="rv">A copilot, not a directory.</h2>
+<div class="grid c3">
+<div class="card rv"><span class="ic" aria-hidden="true">⌖</span><h3>Task Detection</h3><p>Kaizen recognises what you are trying to do — or you just tell it — and organises everything around that outcome.</p></div>
+<div class="card rv"><span class="ic" aria-hidden="true">≡</span><h3>Steps, Not Links</h3><p>Research becomes a sequence: do this, then this. Each step small enough to finish before your coffee cools.</p></div>
+<div class="card rv"><span class="ic" aria-hidden="true">♫</span><h3>Speaks and Listens</h3><p>Full voice in and out, music matched to your mood, and a nudge when the route stalls. A browser that works the way you do.</p></div>
+</div></div></section>
+
+<section class="block" id="waitlist"><div class="wrap">
+<div class="wl-box rv">
+<p class="eyebrow">Launching soon</p>
+<h2>Get routed.</h2>
+<p class="lede" style="margin-inline:auto">Bring one goal you have been circling for weeks. Kaizen’s first job is turning it into a route. Join the waitlist for first access.</p>
+<form class="wl" novalidate>
+<label for="wl-email">Email address</label>
+<input id="wl-email" type="email" name="email" autocomplete="email" spellcheck="false" placeholder="you@company.com…" required>
+<button class="btn" type="submit">Join the Waitlist</button>
+<p class="wl-msg" aria-live="polite"></p>
+</form>
+<p style="margin-top:1rem;color:var(--n500);font-size:.85rem">One email at launch. No spam, no noise — that is the whole brand.</p>
+</div></div></section>
+</main>
+<footer><div class="wrap ftr">
+<div><strong style="color:var(--n100);letter-spacing:.2em">KAIZEN</strong><br>
+The browser for entrepreneurs. Building in public, from India.</div>
+<div class="socials"><a href="https://x.com/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on X (Twitter)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.3 22h-6.3l-4.9-6.4L6.5 22H3.4l7.3-8.3L1.5 2h6.4l4.4 5.9L18.9 2zm-1.1 18h1.7L7 3.9H5.2L17.8 20z"/></svg></a><a href="https://www.instagram.com/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on Instagram"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.25" fill="currentColor" stroke="none"/></svg></a><a href="https://www.youtube.com/@kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on YouTube"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.5 12 4.5 12 4.5s-7 0-8.9.6A3 3 0 0 0 1 7.2 31.3 31.3 0 0 0 .5 12 31.3 31.3 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.6 8.9.6 8.9.6s7 0 8.9-.6a3 3 0 0 0 2.1-2.1A31.3 31.3 0 0 0 23.5 12 31.3 31.3 0 0 0 23 7.2zM9.8 15.5v-7l6 3.5-6 3.5z"/></svg></a><a href="https://www.reddit.com/user/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on Reddit"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm5.1 12.3a3.9 3.9 0 0 1-2 3.4 10.6 10.6 0 0 1-6.2 0 3.9 3.9 0 0 1-2-3.4.9.9 0 0 1 .9-1 1 1 0 0 1 .5.6 8.3 8.3 0 0 0 3.5.8l.7-3.3a.4.4 0 0 1 .3-.3l2.4-.5a1.2 1.2 0 1 1 .2.5l-2.2.5-.6 2.9a8.5 8.5 0 0 0 3.6-.8 1 1 0 0 1 .5-.6.9.9 0 0 1 .9.9zM8.9 12.4a1.4 1.4 0 1 1-1.4 1.4 1.4 1.4 0 0 1 1.4-1.4zm6.3 2.9a3.4 3.4 0 0 1-3.2 1.2 3.4 3.4 0 0 1-3.2-1.2.3.3 0 0 1 .4-.4 4.2 4.2 0 0 0 2.8.9 4.2 4.2 0 0 0 2.8-.9.3.3 0 1 1 .4.4zm-.1-2.9a1.4 1.4 0 1 1-1.4 1.4 1.4 1.4 0 0 1 1.4-1.4z"/></svg></a><a href="https://www.indiehackers.com/kaizenbrowser" target="_blank" rel="noopener" aria-label="Kaizen on Indie Hackers"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16.5" text-anchor="middle" font-size="9.5" font-weight="700" font-family="Arial,sans-serif">IH</text></svg></a></div>
+<div>© 2026 Kaizen · 1% better, every day.</div>
+</div></footer>
+<script>
+(function(){
+  "use strict";
+  var N=144, pad=function(n){return ("00"+n).slice(-3);};
+  var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* header state */
+  var hdr=document.querySelector(".hdr");
+  /* reveals */
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.16});
+  document.querySelectorAll(".rv").forEach(function(el){io.observe(el);});
+  /* waitlist — live via Formspree (form mdeeqzao) */
+  var form=document.querySelector(".wl");
+  if(form){form.addEventListener("submit",function(ev){ev.preventDefault();
+    var input=form.querySelector("input[type=email]"),btn=form.querySelector("button"),msg=form.querySelector(".wl-msg");
+    var email=input.value.trim();
+    var ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if(!ok){msg.textContent="That email looks incomplete — check it and try again.";input.focus();return;}
+    btn.disabled=true;btn.textContent="Joining…";msg.textContent="";
+    fetch("https://formspree.io/f/mdeeqzao",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({email:email})})
+    .then(function(r){
+      if(r.ok){msg.textContent="You are on the list. First invites go out at launch — watch your inbox.";input.disabled=true;btn.textContent="You are in";}
+      else{msg.textContent="That did not go through — give it a moment and try again.";btn.disabled=false;btn.textContent="Join the Waitlist";}
+    })
+    .catch(function(){msg.textContent="That did not go through — check your connection and try again.";btn.disabled=false;btn.textContent="Join the Waitlist";});
+  });}
+  window.addEventListener("scroll",function(){hdr.classList.toggle("scrolled",window.scrollY>40);},{passive:true});
+  if(reduced){return;}
+  /* scroll-scrubbed frame sequence */
+  var section=document.querySelector(".scrub"),canvas=document.getElementById("seq"),ctx=canvas.getContext("2d");
+  var bar=document.querySelector(".progress i");
+  var frames=new Array(N),loaded=0,cur=0,target=0,lastF=-1;
+  for(var i=0;i<N;i++){var im=new Image();im.decoding="async";im.src="frames/f"+pad(i)+".webp";im.onload=function(){loaded++;};frames[i]=im;}
+  function size(){var d=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.floor(innerWidth*d);canvas.height=Math.floor(innerHeight*d);lastF=-1;}
+  size();window.addEventListener("resize",size);
+  function ready(img){return img&&img.complete&&img.naturalWidth>0;}
+  function blit(img){
+    var cw=canvas.width,ch=canvas.height,s=Math.max(cw/img.naturalWidth,ch/img.naturalHeight);
+    var w=img.naturalWidth*s,h=img.naturalHeight*s;
+    ctx.drawImage(img,(cw-w)/2,(ch-h)/2,w,h);
+  }
+  function drawF(f){
+    var i0=Math.floor(f),i1=Math.min(N-1,i0+1),fr=f-i0;
+    var a=frames[i0];
+    if(!ready(a)){
+      if(ready(frames[i1])){blit(frames[i1]);lastF=f;}
+      return;
+    }
+    blit(a);
+    if(fr>0.02&&i1!==i0&&ready(frames[i1])){ctx.globalAlpha=fr;blit(frames[i1]);ctx.globalAlpha=1;}
+    lastF=f;
+  }
+  var acts=Array.prototype.map.call(document.querySelectorAll(".act"),function(el){
+    return {el:el,from:parseFloat(el.dataset.from),to:parseFloat(el.dataset.to)};
+  });
+  function frame(){
+    var r=section.getBoundingClientRect();
+    var total=section.offsetHeight-window.innerHeight;
+    var p=Math.min(1,Math.max(0,-r.top/Math.max(total,1)));
+    target=p*(N-1);cur+=(target-cur)*0.16;
+    if(Math.abs(cur-lastF)>0.004){drawF(cur);}
+    if(bar){bar.style.width=(p*100)+"%";}
+    acts.forEach(function(a){
+      var o=0,y=26;
+      if(p>=a.from&&p<=a.to){
+        var fade=0.07,lp=(p-a.from),rp=(a.to-p);
+        o=Math.min(1,lp/fade,rp/fade);o=Math.max(0,o);
+        var mid=(a.from+a.to)/2,span=(a.to-a.from)/2||1;
+        y=(1-Math.min(1,Math.abs(p-mid)/span))*0+ (p<a.from+span? (1-lp/span)*26 : (1-rp/span)*-26);
+      }
+      a.el.style.opacity=o.toFixed(3);
+      a.el.style.transform="translateY("+y.toFixed(1)+"px)";
+      a.el.classList.toggle("on",o>0.6);
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
