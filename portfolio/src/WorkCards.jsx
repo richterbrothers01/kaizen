@@ -1,11 +1,11 @@
 import { Reveal } from './Reveal.jsx'
 import { projects } from './projects.js'
 
-// Stats1-style cards, plain CSS: rounded card, dark base plus the
+// Stats1-style cards, plain CSS: rounded glass card plus a very subtle
 // repeating diagonal stripe gradient in the project accent colour.
-// Content is only the business name as the big title and one short
-// description line — no badge, no metric, no stars. Clicking a card
-// opens the project modal.
+// Content is only the business name as the big title (pinned to the top)
+// and one bigger description that fills the rest of the card — no badge,
+// no metric, no stars. Clicking a card opens the project modal.
 export default function WorkCards({ onOpen }) {
   return (
     <div className="work-grid">
