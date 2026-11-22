@@ -1,9 +1,21 @@
 import { useEffect, useRef } from 'react'
-import { useMotionValueEvent, useScroll, useSpring } from 'motion/react'
+import { motion, useMotionValueEvent, useScroll, useSpring } from 'motion/react'
 
 // Poster stays until the decoded video is ready to show.
 const POSTER = 'https://kaizenbrowser.vercel.app/xforge-hero-bg.webp'
 const B64_URL = `${import.meta.env.BASE_URL}hero-bg.mp4.b64`
+
+// The video is 120 frames (5s at 24fps). Scroll maps to frames in steps
+// of 5: at the very bottom it wraps to frame 0 and replays.
+const TOTAL_FRAMES = 120
+const FRAME_STEP = 5
+const FPS = 24
+
+function steppedTime(progress) {
+  const clamped = Math.min(Math.max(progress, 0), 1)
+  const frame = (Math.floor(clamped * FPS) * FRAME_STEP) % TOTAL_FRAMES
+  return frame / FPS
+}
 
 // The video is a FIXED full-screen background for the entire page. It never
 // scrolls away and never plays on a timer — scrolling scrubs it frame by
@@ -57,8 +69,7 @@ export default function VideoBackground() {
   useMotionValueEvent(smoothProgress, 'change', (v) => {
     const video = videoRef.current
     if (!video || !durationRef.current || video.readyState < 1) return
-    const target =
-      Math.min(Math.max(v, 0), 1) * durationRef.current
+    const target = steppedTime(v)
     if (Math.abs(video.currentTime - target) > 0.04) {
       try {
         video.currentTime = target
@@ -69,7 +80,13 @@ export default function VideoBackground() {
   })
 
   return (
-    <div className="video-bg-wrap" aria-hidden="true">
+    <motion.div
+      className="video-bg-wrap"
+      aria-hidden="true"
+      initial={{ opacity: 0, filter: 'blur(14px)' }}
+      animate={{ opacity: 1, filter: 'blur(0px)' }}
+      transition={{ duration: 1.1, ease: 'easeOut' }}
+    >
       <video
         ref={videoRef}
         className="video-bg"
@@ -85,8 +102,9 @@ export default function VideoBackground() {
           // be scrubbed, so the first paint already shows the right frame.
           if (duration > 0) {
             try {
-              e.currentTarget.currentTime =
-                Math.min(Math.max(scrollYProgress.get(), 0), 1) * duration
+              e.currentTarget.currentTime = steppedTime(
+                scrollYProgress.get(),
+              )
             } catch {
               // Ignore — the scrub handler below will pick it up.
             }
@@ -95,6 +113,6 @@ export default function VideoBackground() {
       />
       {/* Uniform dim so text stays readable over the video everywhere */}
       <div className="video-bg-dim" />
-    </div>
+    </motion.div>
   )
 }

@@ -1,45 +1,18 @@
+import { useState } from 'react'
+import { AnimatePresence } from 'motion/react'
 import Hero from './Hero.jsx'
 import VideoBackground from './VideoBackground.jsx'
+import About from './About.jsx'
+import WorkCards from './WorkCards.jsx'
+import ProjectModal from './ProjectModal.jsx'
 import { Reveal } from './Reveal.jsx'
 import {
-  Anvil,
   ArrowUpRight,
-  Briefcase,
   Camera,
   Compass,
   GitBranch,
   Play,
 } from 'lucide-react'
-
-const workCards = [
-  {
-    icon: Compass,
-    tag: 'Live project',
-    title: 'Kaizen',
-    desc: 'A browser for founders that gives answers instead of links. The answer, the pros and cons, and the exact next step.',
-    link: 'https://kaizenbrowser.vercel.app',
-    linkLabel: 'kaizenbrowser.vercel.app',
-    status: 'Pre-launch · waitlist open',
-  },
-  {
-    icon: Briefcase,
-    tag: 'Business',
-    title: 'NorthForm',
-    desc: 'My business. Built from scratch, growing in public.',
-    link: null,
-    linkLabel: 'Link coming soon',
-    status: 'In progress',
-  },
-  {
-    icon: Anvil,
-    tag: 'Next forge',
-    title: 'Coming soon',
-    desc: 'The next thing is already on the anvil. Watch this space.',
-    link: null,
-    linkLabel: 'Not forged yet',
-    status: 'In the forge',
-  },
-]
 
 const links = [
   {
@@ -72,9 +45,35 @@ const links = [
     handle: 'kaizenbrowser.vercel.app',
     href: 'https://kaizenbrowser.vercel.app',
   },
+  {
+    icon: Camera,
+    label: 'Instagram',
+    handle: '@northform_hq',
+    href: 'https://instagram.com/northform_hq',
+  },
+  {
+    icon: Play,
+    label: 'YouTube',
+    handle: 'NorthForm',
+    href: 'https://www.youtube.com/channel/UCDjKwSw7avXo4Ow2cU6KsqA',
+  },
+  {
+    icon: Compass,
+    label: 'Website',
+    handle: 'northform.vercel.app',
+    href: 'https://northform.vercel.app',
+  },
+  {
+    icon: Compass,
+    label: 'Website',
+    handle: 'learnmateit.vercel.app',
+    href: 'https://learnmateit.vercel.app',
+  },
 ]
 
 export default function App() {
+  const [modalIndex, setModalIndex] = useState(null)
+
   return (
     <>
       {/* Fixed, scroll-scrubbed video behind the whole page */}
@@ -82,6 +81,8 @@ export default function App() {
 
       <main className="page">
         <Hero />
+
+        <About />
 
         <section id="work" className="section">
           <Reveal delay={0}>
@@ -95,38 +96,11 @@ export default function App() {
           <Reveal delay={0.16}>
             <p className="section-sub">
               Startups, built in public. Each one is a bet on a problem worth
-              solving.
+              solving. Tap a card to read its story.
             </p>
           </Reveal>
 
-          <div className="work-grid">
-            {workCards.map((card, i) => (
-              <Reveal key={card.title} className="reveal reveal-card" delay={i * 0.1}>
-                <article className="work-card">
-                  <div className="work-icon">
-                    <card.icon size={20} strokeWidth={1.75} />
-                  </div>
-                  <p className="work-tag">{card.tag}</p>
-                  <h3 className="work-title">{card.title}</h3>
-                  <p className="work-desc">{card.desc}</p>
-                  {card.link ? (
-                    <a
-                      href={card.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="work-link"
-                    >
-                      {card.linkLabel}
-                      <ArrowUpRight size={15} />
-                    </a>
-                  ) : (
-                    <span className="work-soon">{card.linkLabel}</span>
-                  )}
-                  <p className="work-status">{card.status}</p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
+          <WorkCards onOpen={setModalIndex} />
         </section>
 
         <section id="links" className="section">
@@ -172,6 +146,16 @@ export default function App() {
           </Reveal>
         </footer>
       </main>
+
+      <AnimatePresence>
+        {modalIndex !== null && (
+          <ProjectModal
+            index={modalIndex}
+            onIndexChange={setModalIndex}
+            onClose={() => setModalIndex(null)}
+          />
+        )}
+      </AnimatePresence>
     </>
   )
 }

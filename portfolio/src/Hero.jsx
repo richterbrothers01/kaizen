@@ -1,11 +1,9 @@
-import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'motion/react'
+import { motion } from 'motion/react'
 import { ArrowDown } from 'lucide-react'
 import { Typewriter } from './Typewriter.jsx'
 
-// The hero background image is gone — the fixed scroll-scrubbed video in
-// VideoBackground.jsx is the background now. The glow and veil stay as
-// subtle overlays on top of it.
+// The hero background is the fixed scroll-scrubbed video in
+// VideoBackground.jsx. No light flicker here — the video does the talking.
 
 // Entrance: blur-to-sharp + fade, staggered on load.
 const loadIn = (delay) => ({
@@ -15,34 +13,9 @@ const loadIn = (delay) => ({
 })
 
 export default function Hero() {
-  const heroRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start'],
-  })
-
-  // Court floodlights: flicker OFF and ON in bands as the user keeps
-  // scrolling. Driven by scroll progress only — nothing here animates on
-  // load. Kept subtle now so it does not fight the video behind it.
-  const glowOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.14, 0.28, 0.42, 0.56, 0.7, 0.86, 1],
-    [0.7, 0.05, 0.65, 0.03, 0.7, 0.1, 0.6, 0.08],
-  )
-  const veilOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.14, 0.28, 0.42, 0.56, 0.7, 0.86, 1],
-    [0, 0.38, 0.02, 0.42, 0, 0.34, 0.03, 0.4],
-  )
-
   return (
-    <section ref={heroRef} className="hero">
+    <section className="hero">
       <div className="hero-inner">
-        {/* Floodlight glow — brightens and dies with the scroll */}
-        <motion.div className="hero-glow" style={{ opacity: glowOpacity }} />
-        {/* Dark veil — the court goes dark when the lights cut out */}
-        <motion.div className="hero-veil" style={{ opacity: veilOpacity }} />
-
         <motion.nav {...loadIn(0.15)} className="hero-nav">
           <a href="#" className="hero-brand">
             xforge.git
@@ -51,6 +24,9 @@ export default function Hero() {
           <div className="hero-nav-links">
             <a href="#work" className="hero-nav-link">
               Work
+            </a>
+            <a href="#about" className="hero-nav-link">
+              About
             </a>
             <a href="#links" className="hero-nav-link">
               Links
