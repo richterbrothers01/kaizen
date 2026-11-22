@@ -5,10 +5,7 @@ import { motion } from 'motion/react'
 // and rises slightly, staggered. whileInView with once: false means
 // scrolling up re-animates, and scrolling for more text triggers the
 // reveal for each new paragraph as it enters view.
-// `animate={false}` renders plain text — used for modal slides after the
-// first, so changing slides never re-runs hundreds of blur animations.
-export function WordType({ text, className, stagger = 0.02, delay = 0, animate = true }) {
-  if (!animate) return <span className={className}>{text}</span>
+export function WordType({ text, className, stagger = 0.02, delay = 0 }) {
   const words = text.split(' ')
   return (
     <span className={className}>

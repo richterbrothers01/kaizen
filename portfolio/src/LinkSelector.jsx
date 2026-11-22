@@ -57,8 +57,8 @@ const categories = [
       {
         icon: Compass,
         label: 'Website',
-        handle: 'northform.vercel.app',
-        href: 'https://northform.vercel.app',
+        handle: 'northhform.vercel.app',
+        href: 'https://northhform.vercel.app',
       },
       {
         icon: Compass,

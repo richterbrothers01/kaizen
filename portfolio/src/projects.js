@@ -1,5 +1,5 @@
 // The three projects. Verified facts only — nothing invented, no numbers
-// made up. Accents: Kaizen gold, NorthForm cyan, Next forge mint.
+// made up. Accents: Kaizen gold, NorthForm cyan, LearnMate mint.
 export const projects = [
   {
     id: 'kaizen',
@@ -35,8 +35,8 @@ export const projects = [
     tag: 'Business',
     status: 'In progress',
     desc: 'My business. Built from scratch, growing in public.',
-    link: null,
-    linkLabel: 'Link coming soon',
+    link: 'https://northhform.vercel.app',
+    linkLabel: 'northhform.vercel.app',
     accent: '#38e1ff',
     accent2: '#38bdf8',
     accent3: '#818cf8',
@@ -53,18 +53,18 @@ export const projects = [
       },
       {
         heading: 'Where it stands',
-        text: 'In progress. No customers yet. The link is coming soon — the work is happening in public, and the next update is the site itself.',
+        text: 'In progress. No customers yet. The site is live at northhform.vercel.app, and the work is happening in public.',
       },
     ],
   },
   {
-    id: 'next-forge',
-    name: 'Coming soon',
-    tag: 'Next forge',
-    status: 'In the forge',
-    desc: 'The next thing is already on the anvil. Watch this space.',
-    link: null,
-    linkLabel: 'Not forged yet',
+    id: 'learnmate',
+    name: 'LearnMate',
+    tag: 'Learning platform',
+    status: 'In progress',
+    desc: 'A learning platform with courses, tests, quizzes and milestones.',
+    link: 'https://learnmateit.vercel.app',
+    linkLabel: 'learnmateit.vercel.app',
     accent: '#3dffa8',
     accent2: '#2dd4bf',
     accent3: '#22d3ee',
@@ -72,12 +72,16 @@ export const projects = [
     soft: 'rgba(61, 255, 168, 0.12)',
     sections: [
       {
-        heading: 'Why it exists',
-        text: 'The forge never cools down. After the Kaizen extension comes the next build, and the shortlist is already there — eighteen SaaS ideas, each judged by one rule: real users in the first month, or fail fast and start again. The next forge is whatever survives that filter.',
+        heading: 'How it was made',
+        text: 'Built as a learning platform with a dashboard for courses, an AI Doubt Clearer for questions, and a milestone path in the Duolingo style. It runs on Supabase, and the curriculum comes from shared templates covering classes 1 to 12, with an NCERT question bank behind the tests and quizzes.',
+      },
+      {
+        heading: 'Why it was made',
+        text: 'Because studying is scattered — notes in one place, tests in another, and no clear sense of progress. LearnMate puts courses, milestones, tests and quizzes in one dashboard, so progress is something you can actually see.',
       },
       {
         heading: 'Where it stands',
-        text: 'Not forged yet. The Kaizen extension comes first, then the next thing goes on the anvil. Watch this space.',
+        text: 'In progress. The dashboard with courses and the AI Doubt Clearer is built, and the tests, quizzes and milestone path are the current work, built on the shared question bank. Live at learnmateit.vercel.app.',
       },
     ],
   },

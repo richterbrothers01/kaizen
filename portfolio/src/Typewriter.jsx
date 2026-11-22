@@ -3,13 +3,10 @@ import { motion } from 'motion/react'
 
 // Typewriter: letters type themselves one by one, each fading in from a
 // blur (blur-to-sharp), with a blinking gold caret while typing.
-// `animate={false}` renders the full text at once — used for modal slides
-// after the first, so changing slides never re-types the title.
-export function Typewriter({ text, className, delay = 0, speed = 45, animate = true }) {
+export function Typewriter({ text, className, delay = 0, speed = 45 }) {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
-    if (!animate) return
     let interval
     const start = setTimeout(() => {
       interval = setInterval(() => {
@@ -26,15 +23,7 @@ export function Typewriter({ text, className, delay = 0, speed = 45, animate = t
       clearTimeout(start)
       if (interval) clearInterval(interval)
     }
-  }, [text, delay, speed, animate])
-
-  if (!animate) {
-    return (
-      <span className={className} aria-label={text}>
-        <span aria-hidden="true">{text}</span>
-      </span>
-    )
-  }
+  }, [text, delay, speed])
 
   const done = count >= text.length
 
