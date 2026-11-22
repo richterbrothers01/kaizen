@@ -1,4 +1,6 @@
 import Hero from './Hero.jsx'
+import VideoBackground from './VideoBackground.jsx'
+import { Reveal } from './Reveal.jsx'
 import {
   Anvil,
   ArrowUpRight,
@@ -74,76 +76,102 @@ const links = [
 
 export default function App() {
   return (
-    <main className="page">
-      <Hero />
+    <>
+      {/* Fixed, scroll-scrubbed video behind the whole page */}
+      <VideoBackground />
 
-      <section id="work" className="section">
-        <p className="section-kicker">Work</p>
-        <h2 className="section-title">Everything I&apos;ve forged so far.</h2>
-        <p className="section-sub">
-          Startups, built in public. Each one is a bet on a problem worth
-          solving.
-        </p>
+      <main className="page">
+        <Hero />
 
-        <div className="work-grid">
-          {workCards.map((card) => (
-            <article key={card.title} className="work-card">
-              <div className="work-icon">
-                <card.icon size={20} strokeWidth={1.75} />
-              </div>
-              <p className="work-tag">{card.tag}</p>
-              <h3 className="work-title">{card.title}</h3>
-              <p className="work-desc">{card.desc}</p>
-              {card.link ? (
+        <section id="work" className="section">
+          <Reveal delay={0}>
+            <p className="section-kicker">Work</p>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <h2 className="section-title">
+              Everything I&apos;ve forged so far.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <p className="section-sub">
+              Startups, built in public. Each one is a bet on a problem worth
+              solving.
+            </p>
+          </Reveal>
+
+          <div className="work-grid">
+            {workCards.map((card, i) => (
+              <Reveal key={card.title} className="reveal reveal-card" delay={i * 0.1}>
+                <article className="work-card">
+                  <div className="work-icon">
+                    <card.icon size={20} strokeWidth={1.75} />
+                  </div>
+                  <p className="work-tag">{card.tag}</p>
+                  <h3 className="work-title">{card.title}</h3>
+                  <p className="work-desc">{card.desc}</p>
+                  {card.link ? (
+                    <a
+                      href={card.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="work-link"
+                    >
+                      {card.linkLabel}
+                      <ArrowUpRight size={15} />
+                    </a>
+                  ) : (
+                    <span className="work-soon">{card.linkLabel}</span>
+                  )}
+                  <p className="work-status">{card.status}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <section id="links" className="section">
+          <Reveal delay={0}>
+            <p className="section-kicker">Links</p>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <h2 className="section-title">Find me everywhere.</h2>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <p className="section-sub">
+              Every place my work lives, in one list.
+            </p>
+          </Reveal>
+
+          <div className="links-list">
+            {links.map((link, i) => (
+              <Reveal key={link.handle} className="reveal" delay={i * 0.06}>
                 <a
-                  href={card.link}
+                  href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="work-link"
+                  className="link-row"
                 >
-                  {card.linkLabel}
-                  <ArrowUpRight size={15} />
+                  <span className="link-left">
+                    <link.icon size={20} strokeWidth={1.75} className="link-icon" />
+                    <span className="link-label">{link.label}</span>
+                    <span className="link-handle">{link.handle}</span>
+                  </span>
+                  <ArrowUpRight size={18} className="link-arrow" />
                 </a>
-              ) : (
-                <span className="work-soon">{card.linkLabel}</span>
-              )}
-              <p className="work-status">{card.status}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+              </Reveal>
+            ))}
+          </div>
+        </section>
 
-      <section id="links" className="section">
-        <p className="section-kicker">Links</p>
-        <h2 className="section-title">Find me everywhere.</h2>
-        <p className="section-sub">
-          Every place my work lives, in one list.
-        </p>
-
-        <div className="links-list">
-          {links.map((link) => (
-            <a
-              key={link.handle}
-              href={link.href}
-              target="_blank"
-              rel="noreferrer"
-              className="link-row"
-            >
-              <span className="link-left">
-                <link.icon size={20} strokeWidth={1.75} className="link-icon" />
-                <span className="link-label">{link.label}</span>
-                <span className="link-handle">{link.handle}</span>
-              </span>
-              <ArrowUpRight size={18} className="link-arrow" />
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <footer className="site-footer">
-        <p className="footer-brand">xforge.git</p>
-        <p className="footer-tag">Forged, not found.</p>
-      </footer>
-    </main>
+        <footer className="site-footer">
+          <Reveal delay={0}>
+            <p className="footer-brand">xforge.git</p>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="footer-tag">Forged, not found.</p>
+          </Reveal>
+        </footer>
+      </main>
+    </>
   )
 }

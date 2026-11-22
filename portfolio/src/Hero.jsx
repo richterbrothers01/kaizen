@@ -1,84 +1,18 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { ArrowDown } from 'lucide-react'
+import { Typewriter } from './Typewriter.jsx'
 
-const HERO_BG = 'https://kaizenbrowser.vercel.app/xforge-hero-bg.webp'
+// The hero background image is gone — the fixed scroll-scrubbed video in
+// VideoBackground.jsx is the background now. The glow, veil and leaves
+// stay as subtle overlays on top of it.
 
-const sectionVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.13,
-      delayChildren: 0.08,
-    },
-  },
-}
-
-// Nav slides in from the left with a crisp spring
-const navVariants = {
-  hidden: { opacity: 0, x: -28, scale: 0.97 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: { type: 'spring', stiffness: 280, damping: 24, mass: 0.85 },
-  },
-}
-
-// Background scales up from slightly below with a slow, cinematic settle
-const imageVariants = {
-  hidden: { opacity: 0, scale: 1.12, y: 18 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { type: 'spring', stiffness: 55, damping: 18, mass: 1.4 },
-  },
-}
-
-// Copy reveals with a 3D perspective tilt (rotateX) — card-flipping feel
-const copyVariants = {
-  hidden: { opacity: 0, y: 28, rotateX: 14, scale: 0.97 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    rotateX: 0,
-    scale: 1,
-    transition: { type: 'spring', stiffness: 210, damping: 30, mass: 0.9 },
-  },
-}
-
-const buttonRowVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.14,
-      delayChildren: 0.04,
-    },
-  },
-}
-
-// Buttons pop in with an elastic overshoot
-const buttonVariants = {
-  hidden: { opacity: 0, scale: 0.82, y: 10 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { type: 'spring', stiffness: 350, damping: 22, mass: 0.75 },
-  },
-}
-
-// Footer drifts up with a gentle, light bounce
-const footerVariants = {
-  hidden: { opacity: 0, y: 20, scale: 0.97 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: 'spring', stiffness: 180, damping: 24, mass: 1 },
-  },
-}
+// Entrance: blur-to-sharp + fade, staggered on load.
+const loadIn = (delay) => ({
+  initial: { opacity: 0, filter: 'blur(12px)', y: 18 },
+  animate: { opacity: 1, filter: 'blur(0px)', y: 0 },
+  transition: { duration: 0.7, delay, ease: 'easeOut' },
+})
 
 // A hanging branch of dark leaves, drawn as inline SVG — no image files.
 function LeafCluster({ className }) {
@@ -148,17 +82,18 @@ export default function Hero() {
     offset: ['start start', 'end start'],
   })
 
-  // Court floodlights: flicker OFF and ON in bands as the user keeps scrolling.
-  // Driven by scroll progress only — nothing here animates on load.
+  // Court floodlights: flicker OFF and ON in bands as the user keeps
+  // scrolling. Driven by scroll progress only — nothing here animates on
+  // load. Kept subtle now so it does not fight the video behind it.
   const glowOpacity = useTransform(
     scrollYProgress,
     [0, 0.14, 0.28, 0.42, 0.56, 0.7, 0.86, 1],
-    [1, 0.08, 0.95, 0.05, 1, 0.15, 0.9, 0.1],
+    [0.7, 0.05, 0.65, 0.03, 0.7, 0.1, 0.6, 0.08],
   )
   const veilOpacity = useTransform(
     scrollYProgress,
     [0, 0.14, 0.28, 0.42, 0.56, 0.7, 0.86, 1],
-    [0, 0.55, 0.04, 0.62, 0, 0.5, 0.06, 0.58],
+    [0, 0.38, 0.02, 0.42, 0, 0.34, 0.03, 0.4],
   )
 
   // Foreground leaves: parallax drift on scroll, slower than the page.
@@ -171,20 +106,7 @@ export default function Hero() {
 
   return (
     <section ref={heroRef} className="hero">
-      <motion.div
-        className="hero-inner"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.34 }}
-        variants={sectionVariants}
-      >
-        <motion.img
-          variants={imageVariants}
-          src={HERO_BG}
-          alt="Night basketball court under floodlights in a dark forest"
-          className="hero-bg"
-        />
-
+      <div className="hero-inner">
         {/* Floodlight glow — brightens and dies with the scroll */}
         <motion.div className="hero-glow" style={{ opacity: glowOpacity }} />
         {/* Dark veil — the court goes dark when the lights cut out */}
@@ -238,7 +160,7 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        <motion.nav variants={navVariants} className="hero-nav">
+        <motion.nav {...loadIn(0.15)} className="hero-nav">
           <a href="#" className="hero-brand">
             xforge.git
           </a>
@@ -272,51 +194,49 @@ export default function Hero() {
 
         <div className="hero-copy">
           <div className="hero-copy-inner">
-            <motion.h1 variants={copyVariants} className="hero-title">
-              <span className="hero-title-line">Forged,</span>
+            <h1 className="hero-title">
               <span className="hero-title-line">
-                <span className="hero-title-highlight">not found.</span>
+                <Typewriter text="Forged," delay={300} speed={55} />
               </span>
-            </motion.h1>
+              <span className="hero-title-line">
+                <Typewriter
+                  text="not found."
+                  className="hero-title-highlight"
+                  delay={800}
+                  speed={55}
+                />
+              </span>
+            </h1>
 
-            <motion.p variants={copyVariants} className="hero-desc">
-              Every startup I build, in one place. Kaizen, NorthForm, and
-              whatever I forge next.
-            </motion.p>
+            <p className="hero-desc">
+              <Typewriter
+                text="Every startup I build, in one place. Kaizen, NorthForm, and whatever I forge next."
+                delay={1450}
+                speed={16}
+              />
+            </p>
 
-            <motion.div variants={buttonRowVariants} className="hero-ctas">
-              <motion.a
-                variants={buttonVariants}
-                href="#work"
-                className="btn-gold"
-              >
+            <motion.div {...loadIn(1.7)} className="hero-ctas">
+              <a href="#work" className="btn-gold">
                 See my work
-              </motion.a>
-              <motion.a
-                variants={buttonVariants}
-                href="#links"
-                className="btn-outline btn-outline-lg"
-              >
+              </a>
+              <a href="#links" className="btn-outline btn-outline-lg">
                 All my links
-              </motion.a>
+              </a>
             </motion.div>
           </div>
         </div>
 
-        <motion.blockquote variants={footerVariants} className="hero-quote">
+        <motion.blockquote {...loadIn(2.1)} className="hero-quote">
           <p>&ldquo;Built in public. Forged in private.&rdquo;</p>
           <footer>-XFORGE.GIT</footer>
         </motion.blockquote>
 
-        <motion.a
-          variants={footerVariants}
-          href="#work"
-          className="hero-scroll"
-        >
+        <motion.a {...loadIn(2.3)} href="#work" className="hero-scroll">
           Scroll to Discover
           <ArrowDown className="hero-scroll-icon" />
         </motion.a>
-      </motion.div>
+      </div>
     </section>
   )
 }
