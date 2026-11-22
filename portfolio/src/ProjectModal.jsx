@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
@@ -12,9 +12,11 @@ import { Typewriter } from './Typewriter.jsx'
 import { WordType } from './WordType.jsx'
 import { projects } from './projects.js'
 
-// Carousel slide variants (from the pasted carousel style): the panel
-// content slides in with a tilt and a brightness flash, drags sideways,
-// and the centre state sits straight so the bio reads cleanly.
+// Carousel slide variants (from the pasted carousel style): the whole
+// card slides in with a tilt and a brightness flash, drags sideways, and
+// the centre state sits straight so the bio reads cleanly. The variants
+// live on the OUTER panel now, so the entire card swipes — not just the
+// text inside it.
 const carouselVariants = {
   enter: (direction) => ({
     x: direction > 0 ? 200 : -200,
@@ -46,6 +48,7 @@ export default function ProjectModal({ index, onIndexChange, onClose }) {
   const [direction, setDirection] = useState(1)
   const dragX = useMotionValue(0)
   const rotate = useTransform(dragX, [-200, 200], [-18, 18])
+  const firstMountRef = useRef(true)
 
   // Escape closes. While open, Lenis and body scroll stop; the panel
   // itself scrolls via data-lenis-prevent.
@@ -56,6 +59,7 @@ export default function ProjectModal({ index, onIndexChange, onClose }) {
     window.addEventListener('keydown', onKey)
     lenis?.stop()
     document.body.style.overflow = 'hidden'
+    firstMountRef.current = false
     return () => {
       window.removeEventListener('keydown', onKey)
       lenis?.start()
@@ -87,55 +91,46 @@ export default function ProjectModal({ index, onIndexChange, onClose }) {
       transition={{ duration: 0.25, ease: 'easeOut' }}
       onClick={onClose}
     >
-      {/* Aurora behind the panel, in the site's colours */}
-      <div className="modal-aurora" aria-hidden="true">
-        <span className="aurora-blob aurora-blob-gold" />
-        <span className="aurora-blob aurora-blob-cyan" />
-        <span className="aurora-blob aurora-blob-mint" />
-      </div>
+      <AnimatePresence custom={direction} mode="wait" initial={false}>
+        <motion.div
+          key={index}
+          className="modal-panel"
+          data-lenis-prevent
+          custom={direction}
+          variants={carouselVariants}
+          initial={
+            firstMountRef.current
+              ? { opacity: 0, scale: 0.96, y: 12 }
+              : 'enter'
+          }
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: 'spring', bounce: 0.2, duration: 0.5 },
+            scale: { duration: 0.35 },
+            opacity: { duration: 0.25 },
+          }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          style={{ rotate, x: dragX }}
+          onDragEnd={handleDragEnd}
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-label={project.name}
+        >
+          <div className="modal-close-wrap">
+            <button
+              type="button"
+              className="modal-close"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
+          </div>
 
-      <motion.div
-        className="modal-panel"
-        data-lenis-prevent
-        initial={{ opacity: 0, scale: 0.96, y: 12 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 12 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label={project.name}
-      >
-        <div className="modal-close-wrap">
-          <button
-            type="button"
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <AnimatePresence custom={direction} mode="wait" initial={false}>
-          <motion.div
-            key={index}
-            custom={direction}
-            variants={carouselVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: 'spring', bounce: 0.2, duration: 0.5 },
-              scale: { duration: 0.35 },
-              opacity: { duration: 0.25 },
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            style={{ rotate, x: dragX }}
-            onDragEnd={handleDragEnd}
-            className="modal-content"
-          >
+          <div className="modal-content">
             <span
               className="modal-pill"
               style={{ '--accent': project.accent, '--soft': project.soft }}
@@ -168,48 +163,48 @@ export default function ProjectModal({ index, onIndexChange, onClose }) {
                 <ArrowUpRight size={15} />
               </a>
             )}
-          </motion.div>
-        </AnimatePresence>
-
-        <div className="modal-navigator">
-          <motion.button
-            type="button"
-            className="nav-arrow"
-            onClick={() => goTo(index - 1)}
-            disabled={index === 0}
-            whileTap={{ scale: 0.9 }}
-            aria-label="Previous project"
-          >
-            <ChevronLeft size={22} strokeWidth={3} />
-          </motion.button>
-
-          <div className="nav-dots">
-            {projects.map((p, i) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={p.name}
-                className={clsx(
-                  'nav-dot',
-                  i === index && 'nav-dot-active',
-                )}
-              />
-            ))}
           </div>
 
-          <motion.button
-            type="button"
-            className="nav-arrow"
-            onClick={() => goTo(index + 1)}
-            disabled={index === projects.length - 1}
-            whileTap={{ scale: 0.9 }}
-            aria-label="Next project"
-          >
-            <ChevronRight size={22} strokeWidth={3} />
-          </motion.button>
-        </div>
-      </motion.div>
+          <div className="modal-navigator">
+            <motion.button
+              type="button"
+              className="nav-arrow"
+              onClick={() => goTo(index - 1)}
+              disabled={index === 0}
+              whileTap={{ scale: 0.9 }}
+              aria-label="Previous project"
+            >
+              <ChevronLeft size={22} strokeWidth={3} />
+            </motion.button>
+
+            <div className="nav-dots">
+              {projects.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={p.name}
+                  className={clsx(
+                    'nav-dot',
+                    i === index && 'nav-dot-active',
+                  )}
+                />
+              ))}
+            </div>
+
+            <motion.button
+              type="button"
+              className="nav-arrow"
+              onClick={() => goTo(index + 1)}
+              disabled={index === projects.length - 1}
+              whileTap={{ scale: 0.9 }}
+              aria-label="Next project"
+            >
+              <ChevronRight size={22} strokeWidth={3} />
+            </motion.button>
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   )
 }

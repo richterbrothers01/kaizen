@@ -5,15 +5,18 @@ import { motion, useMotionValueEvent, useScroll, useSpring } from 'motion/react'
 const POSTER = 'https://kaizenbrowser.vercel.app/xforge-hero-bg.webp'
 const B64_URL = `${import.meta.env.BASE_URL}hero-bg.mp4.b64`
 
-// The video is 120 frames (5s at 24fps). Scroll maps to frames in steps
-// of 5: at the very bottom it wraps to frame 0 and replays.
-const TOTAL_FRAMES = 120
+// The video is 60fps (trimmed to start at the rain, ~3.93s, 236 frames).
+// Total frames are computed from the loaded metadata. Scroll maps to
+// frames in steps of 5: at the very bottom it wraps to frame 0 and replays.
+const FPS = 60
 const FRAME_STEP = 5
-const FPS = 24
 
-function steppedTime(progress) {
+function steppedTime(progress, totalFrames) {
+  if (!totalFrames) return 0
   const clamped = Math.min(Math.max(progress, 0), 1)
-  const frame = (Math.floor(clamped * FPS) * FRAME_STEP) % TOTAL_FRAMES
+  const frame =
+    (Math.floor(clamped * (totalFrames / FRAME_STEP)) * FRAME_STEP) %
+    totalFrames
   return frame / FPS
 }
 
@@ -23,6 +26,7 @@ function steppedTime(progress) {
 export default function VideoBackground() {
   const videoRef = useRef(null)
   const durationRef = useRef(0)
+  const totalFramesRef = useRef(0)
 
   // Load the base64 asset, decode it to a Blob, and hand the video an
   // object URL. The base64 string never goes into a JS bundle.
@@ -69,7 +73,7 @@ export default function VideoBackground() {
   useMotionValueEvent(smoothProgress, 'change', (v) => {
     const video = videoRef.current
     if (!video || !durationRef.current || video.readyState < 1) return
-    const target = steppedTime(v)
+    const target = steppedTime(v, totalFramesRef.current)
     if (Math.abs(video.currentTime - target) > 0.04) {
       try {
         video.currentTime = target
@@ -98,12 +102,17 @@ export default function VideoBackground() {
         onLoadedMetadata={(e) => {
           const duration = e.currentTarget.duration || 0
           durationRef.current = duration
+          // Round the frame count DOWN to a multiple of the step, so
+          // progress 1 maps exactly back to frame 0 (replay).
+          totalFramesRef.current =
+            Math.floor((duration * FPS) / FRAME_STEP) * FRAME_STEP
           // Seek to the current scroll position as soon as the video can
           // be scrubbed, so the first paint already shows the right frame.
           if (duration > 0) {
             try {
               e.currentTarget.currentTime = steppedTime(
                 scrollYProgress.get(),
+                totalFramesRef.current,
               )
             } catch {
               // Ignore — the scrub handler below will pick it up.

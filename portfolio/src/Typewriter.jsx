@@ -40,7 +40,7 @@ export function Typewriter({ text, className, delay = 0, speed = 45 }) {
               animate={{ opacity: 1, filter: 'blur(0px)' }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
             >
-              {ch === ' ' ? ' ' : ch}
+              {ch === ' ' ? ' ' : ch}
             </motion.span>
           ))}
         {!done && <span className="type-caret" />}

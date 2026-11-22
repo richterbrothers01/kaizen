@@ -1,5 +1,3 @@
-import { FaBolt, FaRocket, FaShieldAlt } from 'react-icons/fa'
-
 // The three projects. Verified facts only — nothing invented, no numbers
 // made up. Accents: Kaizen gold, NorthForm cyan, Next forge mint.
 export const projects = [
@@ -8,10 +6,9 @@ export const projects = [
     name: 'Kaizen',
     tag: 'Live project',
     status: 'Pre-launch · waitlist open',
-    desc: 'A browser for founders that gives answers instead of links. The answer, the pros and cons, and the exact next step.',
+    desc: 'A browser for founders that gives answers instead of links.',
     link: 'https://kaizenbrowser.vercel.app',
     linkLabel: 'kaizenbrowser.vercel.app',
-    icon: FaBolt,
     accent: '#f2b33d',
     accent2: '#fb923c',
     accent3: '#fb7185',
@@ -20,15 +17,15 @@ export const projects = [
     sections: [
       {
         heading: 'How it was made',
-        text: 'First built as a React and Vite clickable demo with motion animations. The real product is a Chromium-based browser for founders, built by restyling Chrome black-and-grey minimal. The guidance feature comes first as a Chrome extension with hardcoded routes.',
+        text: 'First built as a React and Vite clickable demo with motion animations — the tab bar, the address bar, the sidebar, the new tab page with its ask bar, and the answer screen. The real product is a Chromium-based browser for founders, built by restyling Chrome black-and-grey minimal, with the Kaizen logo and name. The guidance feature comes first as a Chrome extension with hardcoded routes: on a task page, everything except the task greys out, and a side panel shows what to click next, what not to click, what happens after, and the next step. No Kaizen AI in the first version — the answer engine comes later.',
       },
       {
         heading: 'Why it was made',
-        text: 'I drown in 30 tabs a day and wanted a browser that gives the answer, the pros and cons, and the exact next step instead of links.',
+        text: 'I drown in 30 tabs a day and wanted a browser that gives the answer, the pros and cons, and the exact next step instead of links. Every search ends in a pile of tabs and zero steps taken, so Kaizen is built around one idea: the search ends, the route begins. It is for founders, entrepreneurs and traders who would rather build than browse.',
       },
       {
         heading: 'Where it stands',
-        text: 'Pre-launch, waitlist open. Three reels a day since 10 November. The React demo is private. The browser build is on hold while I pick the next SaaS — the extension comes first.',
+        text: 'Pre-launch, waitlist open. Three reels a day since 10 November, building in public on Instagram, YouTube, X and Indie Hackers. The React demo is private. The browser build is on hold while I pick the next SaaS — the extension comes first, and the kill test is simple: give it to ten real founders, and if nobody uses it a second time, it gets dropped.',
       },
     ],
   },
@@ -40,7 +37,6 @@ export const projects = [
     desc: 'My business. Built from scratch, growing in public.',
     link: null,
     linkLabel: 'Link coming soon',
-    icon: FaRocket,
     accent: '#38e1ff',
     accent2: '#38bdf8',
     accent3: '#818cf8',
@@ -49,15 +45,15 @@ export const projects = [
     sections: [
       {
         heading: 'How it was made',
-        text: 'Built from scratch with my co-founder, growing in public.',
+        text: 'Built from scratch with my co-founder, growing in public. It started as an idea between the two of us and has been shaped in the open ever since, one step at a time, with no shortcuts and no outside money.',
       },
       {
         heading: 'Why it was made',
-        text: 'To build a real business and brand, not just a project.',
+        text: 'To build a real business and brand, not just a project. NorthForm is the long game — something that grows slowly and compounds, built properly from the ground up rather than chased for fast money.',
       },
       {
         heading: 'Where it stands',
-        text: 'In progress. No customers yet. Link coming soon.',
+        text: 'In progress. No customers yet. The link is coming soon — the work is happening in public, and the next update is the site itself.',
       },
     ],
   },
@@ -69,7 +65,6 @@ export const projects = [
     desc: 'The next thing is already on the anvil. Watch this space.',
     link: null,
     linkLabel: 'Not forged yet',
-    icon: FaShieldAlt,
     accent: '#3dffa8',
     accent2: '#2dd4bf',
     accent3: '#22d3ee',
@@ -77,8 +72,12 @@ export const projects = [
     soft: 'rgba(61, 255, 168, 0.12)',
     sections: [
       {
+        heading: 'Why it exists',
+        text: 'The forge never cools down. After the Kaizen extension comes the next build, and the shortlist is already there — eighteen SaaS ideas, each judged by one rule: real users in the first month, or fail fast and start again. The next forge is whatever survives that filter.',
+      },
+      {
         heading: 'Where it stands',
-        text: 'The next thing is already on the anvil. Not forged yet. Watch this space.',
+        text: 'Not forged yet. The Kaizen extension comes first, then the next thing goes on the anvil. Watch this space.',
       },
     ],
   },
