@@ -79,7 +79,18 @@ export default function VideoBackground() {
         preload="auto"
         disablePictureInPicture
         onLoadedMetadata={(e) => {
-          durationRef.current = e.currentTarget.duration || 0
+          const duration = e.currentTarget.duration || 0
+          durationRef.current = duration
+          // Seek to the current scroll position as soon as the video can
+          // be scrubbed, so the first paint already shows the right frame.
+          if (duration > 0) {
+            try {
+              e.currentTarget.currentTime =
+                Math.min(Math.max(scrollYProgress.get(), 0), 1) * duration
+            } catch {
+              // Ignore — the scrub handler below will pick it up.
+            }
+          }
         }}
       />
       {/* Uniform dim so text stays readable over the video everywhere */}

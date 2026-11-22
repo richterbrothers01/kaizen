@@ -139,62 +139,6 @@ a {
   opacity: 0;
 }
 
-.hero-leaves {
-  pointer-events: none;
-  position: absolute;
-  top: -12px;
-  z-index: 15;
-  width: 340px;
-  max-width: 62vw;
-}
-
-.hero-leaves-left {
-  left: -30px;
-}
-
-.hero-leaves-right {
-  right: -30px;
-}
-
-.hero-leaf-svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  opacity: 0.96;
-}
-
-.hero-leaf-flip {
-  transform: scaleX(-1);
-}
-
-.hero-loose-leaf {
-  pointer-events: none;
-  position: absolute;
-  z-index: 15;
-}
-
-.hero-loose-1 {
-  left: 14%;
-  top: 34%;
-}
-
-.hero-loose-2 {
-  right: 16%;
-  top: 58%;
-}
-
-.hero-loose-3 {
-  left: 46%;
-  top: 16%;
-}
-
-.hero-loose-svg {
-  display: block;
-  width: 44px;
-  height: auto;
-  opacity: 0.9;
-}
-
 .hero-nav {
   position: relative;
   z-index: 20;
