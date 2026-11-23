@@ -43,18 +43,23 @@ function frameIsVisible(video) {
 // scrolls away and never plays on a timer — scrolling scrubs it frame by
 // frame, smoothed by a spring so it feels buttery instead of jumpy.
 //
-// Mobile fix: phones will not render a frame of a video that has never
+// Mobile reality: phones will not render a frame of a video that has never
 // played — a scrubbed-only video stays black, and once the video loads the
-// poster is replaced by that black frame. So we (1) prime the decoder by
-// playing muted for a moment and pausing, which is allowed without a tap
-// because the video is muted + playsInline, and (2) keep the poster photo
-// layered over the video until a real frame is proven visible. If the video
-// never renders, the photo stays — the page is never a black screen.
+// poster is replaced by that black frame. Worse, play() followed by an
+// immediate pause() can finish before the phone presents even one frame,
+// so the video still has nothing to show and seeks stay black. So we
+// (1) prime the decoder by playing muted until the compositor has genuinely
+// presented a frame (requestVideoFrameCallback), only then pausing, (2) keep
+// the poster photo layered over the video until a real frame is proven
+// visible, and (3) retry the prime on the user's first touch — a real tap
+// lifts autoplay blocks (low-power mode, data saver) that reject play()
+// on load. If the video never renders, the photo stays — never a black page.
 export default function VideoBackground() {
   const videoRef = useRef(null)
   const durationRef = useRef(0)
   const totalFramesRef = useRef(0)
-  const primedRef = useRef(false)
+  const provenRef = useRef(false)
+  const primingRef = useRef(false)
   const [posterGone, setPosterGone] = useState(false)
 
   // Load the base64 asset, decode it to a Blob, and hand the video an
@@ -112,47 +117,92 @@ export default function VideoBackground() {
     }
   })
 
-  // Prime the decoder once the video has data, then hide the poster photo
-  // only after a real frame is proven on screen.
+  // Prime the decoder: play muted until one frame is genuinely presented,
+  // then pause and seek to the scroll target. Hides the poster photo only
+  // once a real frame is proven on screen.
   const primeVideo = async () => {
     const video = videoRef.current
-    if (!video || primedRef.current) return
-    primedRef.current = true
+    if (!video || provenRef.current || primingRef.current) return
+    primingRef.current = true
     try {
-      await video.play()
-    } catch {
-      // Play blocked — the poster photo stays as the fallback.
-    }
-    try {
-      video.pause()
-    } catch {
-      // Ignore.
-    }
-    try {
-      video.currentTime = steppedTime(
-        scrollYProgress.get(),
-        totalFramesRef.current,
-      )
-    } catch {
-      // Ignore — the scrub handler will pick it up.
-    }
-    for (let i = 0; i < 12; i++) {
-      await new Promise((r) => setTimeout(r, 150))
-      if (frameIsVisible(video)) {
-        setPosterGone(true)
-        return
-      }
+      const presented = await new Promise((resolve) => {
+        let done = false
+        const finish = (ok) => {
+          if (!done) {
+            done = true
+            resolve(ok)
+          }
+        }
+        const onFrame = () => {
+          try {
+            video.pause()
+          } catch {
+            // Ignore.
+          }
+          finish(true)
+        }
+        if ('requestVideoFrameCallback' in video) {
+          try {
+            video.requestVideoFrameCallback(onFrame)
+          } catch {
+            // Fall through to the timeupdate listener.
+          }
+        }
+        video.addEventListener('timeupdate', onFrame, { once: true })
+        setTimeout(() => finish(false), 1200)
+        video.play().catch(() => finish(false))
+      })
+
       try {
         video.currentTime = steppedTime(
           scrollYProgress.get(),
           totalFramesRef.current,
         )
       } catch {
-        // Ignore.
+        // Ignore — the scrub handler will pick it up.
       }
+
+      // requestVideoFrameCallback firing means the compositor presented a
+      // frame: the video is showing picture, so the poster can go at once.
+      if (presented) {
+        provenRef.current = true
+        setPosterGone(true)
+        return
+      }
+      // Otherwise keep checking the pixels — seeks may still render.
+      for (let i = 0; i < 10; i++) {
+        if (frameIsVisible(video)) {
+          provenRef.current = true
+          setPosterGone(true)
+          return
+        }
+        await new Promise((r) => setTimeout(r, 150))
+        try {
+          video.currentTime = steppedTime(
+            scrollYProgress.get(),
+            totalFramesRef.current,
+          )
+        } catch {
+          // Ignore.
+        }
+      }
+      // Still no proof after ~1.5s: leave the poster photo up. Never black.
+    } finally {
+      primingRef.current = false
     }
-    // Still black after ~2s: leave the poster photo up. Never a black page.
   }
+
+  // A real touch lifts autoplay blocks that reject play() on load (low
+  // power mode, data saver). Retry the prime on the first touch if the
+  // video still has not proven a frame.
+  useEffect(() => {
+    const retry = () => {
+      if (!provenRef.current) primeVideo()
+    }
+    window.addEventListener('pointerdown', retry)
+    return () => window.removeEventListener('pointerdown', retry)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <motion.div
