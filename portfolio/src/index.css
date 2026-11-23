@@ -55,6 +55,8 @@ a {
 }
 
 .video-bg {
+  position: relative;
+  z-index: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -62,9 +64,31 @@ a {
   object-position: center;
 }
 
+/* Poster photo layered OVER the video until a real video frame is proven
+   visible. Phones show a black frame for a video that never played — this
+   layer keeps the page from ever being a black screen. */
+.video-bg-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.video-bg-poster.gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .video-bg-dim {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: rgba(0, 0, 0, 0.32);
 }
 

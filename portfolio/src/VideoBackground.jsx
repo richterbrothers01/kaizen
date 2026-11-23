@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValueEvent, useScroll, useSpring } from 'motion/react'
 
 // Poster stays until the decoded video is ready to show.
@@ -20,13 +20,42 @@ function steppedTime(progress, totalFrames) {
   return frame / FPS
 }
 
+// True when the video is actually showing a picture (not a black frame).
+// Same-origin blob, so drawing it to a canvas is allowed.
+function frameIsVisible(video) {
+  try {
+    if (video.readyState < 2) return false
+    const c = document.createElement('canvas')
+    c.width = 32
+    c.height = 18
+    const g = c.getContext('2d')
+    g.drawImage(video, 0, 0, 32, 18)
+    const d = g.getImageData(0, 0, 32, 18).data
+    let sum = 0
+    for (let i = 0; i < d.length; i += 4) sum += (d[i] + d[i + 1] + d[i + 2]) / 3
+    return sum / (d.length / 4) > 5
+  } catch {
+    return false
+  }
+}
+
 // The video is a FIXED full-screen background for the entire page. It never
 // scrolls away and never plays on a timer — scrolling scrubs it frame by
 // frame, smoothed by a spring so it feels buttery instead of jumpy.
+//
+// Mobile fix: phones will not render a frame of a video that has never
+// played — a scrubbed-only video stays black, and once the video loads the
+// poster is replaced by that black frame. So we (1) prime the decoder by
+// playing muted for a moment and pausing, which is allowed without a tap
+// because the video is muted + playsInline, and (2) keep the poster photo
+// layered over the video until a real frame is proven visible. If the video
+// never renders, the photo stays — the page is never a black screen.
 export default function VideoBackground() {
   const videoRef = useRef(null)
   const durationRef = useRef(0)
   const totalFramesRef = useRef(0)
+  const primedRef = useRef(false)
+  const [posterGone, setPosterGone] = useState(false)
 
   // Load the base64 asset, decode it to a Blob, and hand the video an
   // object URL. The base64 string never goes into a JS bundle.
@@ -83,6 +112,48 @@ export default function VideoBackground() {
     }
   })
 
+  // Prime the decoder once the video has data, then hide the poster photo
+  // only after a real frame is proven on screen.
+  const primeVideo = async () => {
+    const video = videoRef.current
+    if (!video || primedRef.current) return
+    primedRef.current = true
+    try {
+      await video.play()
+    } catch {
+      // Play blocked — the poster photo stays as the fallback.
+    }
+    try {
+      video.pause()
+    } catch {
+      // Ignore.
+    }
+    try {
+      video.currentTime = steppedTime(
+        scrollYProgress.get(),
+        totalFramesRef.current,
+      )
+    } catch {
+      // Ignore — the scrub handler will pick it up.
+    }
+    for (let i = 0; i < 12; i++) {
+      await new Promise((r) => setTimeout(r, 150))
+      if (frameIsVisible(video)) {
+        setPosterGone(true)
+        return
+      }
+      try {
+        video.currentTime = steppedTime(
+          scrollYProgress.get(),
+          totalFramesRef.current,
+        )
+      } catch {
+        // Ignore.
+      }
+    }
+    // Still black after ~2s: leave the poster photo up. Never a black page.
+  }
+
   return (
     <motion.div
       className="video-bg-wrap"
@@ -119,6 +190,16 @@ export default function VideoBackground() {
             }
           }
         }}
+        onLoadedData={primeVideo}
+      />
+      {/* Poster photo over the video until a real frame is proven visible.
+          On phones the video stays black until it has played once — this
+          layer is what stops the page ever being a black screen. */}
+      <img
+        className={posterGone ? 'video-bg-poster gone' : 'video-bg-poster'}
+        src={POSTER}
+        alt=""
+        aria-hidden="true"
       />
       {/* Uniform dim so text stays readable over the video everywhere */}
       <div className="video-bg-dim" />
