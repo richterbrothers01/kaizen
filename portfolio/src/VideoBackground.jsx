@@ -9,9 +9,24 @@ const B64_URL = `${import.meta.env.BASE_URL}hero-bg.mp4.b64`
 
 // The video is 60fps (trimmed to start at the rain, ~3.93s, 236 frames).
 // Total frames are computed from the loaded metadata. Scroll maps to
-// frames in steps of 5: at the very bottom it wraps to frame 0 and replays.
+// frames in steps of 5, and the video wraps to frame 0 and replays.
 const FPS = 60
 const FRAME_STEP = 5
+// Pixels of scrolling per 5-frame step. The rate is fixed in pixels —
+// NOT mapped to page progress — so the video advances at the same rate
+// on every page, long or short. (Page progress made the long home page
+// crawl at ~58px per step while the short contact page stepped every
+// ~12px and felt far smoother.) 12px per step matches the contact page.
+const PIXELS_PER_STEP = 12
+
+// Which loop position (0..1) a scroll offset in pixels is at: one full
+// video pass every (totalFrames / FRAME_STEP) * PIXELS_PER_STEP px,
+// wrapping so the video replays as you keep scrolling.
+function progressFromPixels(scrollPx, totalFrames) {
+  if (!totalFrames) return 0
+  const loopPx = (totalFrames / FRAME_STEP) * PIXELS_PER_STEP
+  return (((scrollPx / loopPx) % 1) + 1) % 1
+}
 
 function steppedTime(progress, totalFrames) {
   if (!totalFrames) return 0
@@ -123,18 +138,22 @@ export default function VideoBackground() {
     }
   }, [])
 
-  // Page scroll progress, spring-smoothed for buttery scrubbing.
-  const { scrollYProgress } = useScroll()
-  const smoothProgress = useSpring(scrollYProgress, {
+  // Page scroll in pixels, spring-smoothed for buttery scrubbing.
+  // The spring is overdamped (no overshoot), it only smooths the motion.
+  const { scrollY } = useScroll()
+  const smoothY = useSpring(scrollY, {
     stiffness: 120,
     damping: 30,
     mass: 0.4,
   })
 
-  useMotionValueEvent(smoothProgress, 'change', (v) => {
+  useMotionValueEvent(smoothY, 'change', (v) => {
     const video = videoRef.current
     if (!video || !durationRef.current || video.readyState < 1) return
-    const target = steppedTime(v, totalFramesRef.current)
+    const target = steppedTime(
+      progressFromPixels(v, totalFramesRef.current),
+      totalFramesRef.current,
+    )
     if (Math.abs(video.currentTime - target) > 0.04) {
       try {
         video.currentTime = target
@@ -182,7 +201,7 @@ export default function VideoBackground() {
 
       try {
         video.currentTime = steppedTime(
-          scrollYProgress.get(),
+          progressFromPixels(scrollY.get(), totalFramesRef.current),
           totalFramesRef.current,
         )
       } catch {
@@ -206,7 +225,7 @@ export default function VideoBackground() {
         await new Promise((r) => setTimeout(r, 150))
         try {
           video.currentTime = steppedTime(
-            scrollYProgress.get(),
+            progressFromPixels(scrollY.get(), totalFramesRef.current),
             totalFramesRef.current,
           )
         } catch {
@@ -259,7 +278,7 @@ export default function VideoBackground() {
           if (duration > 0) {
             try {
               e.currentTarget.currentTime = steppedTime(
-                scrollYProgress.get(),
+                progressFromPixels(scrollY.get(), totalFramesRef.current),
                 totalFramesRef.current,
               )
             } catch {
