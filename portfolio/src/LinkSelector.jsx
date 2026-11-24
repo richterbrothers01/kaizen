@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'motion/react'
+import { AnimatePresence, motion, MotionConfig } from 'motion/react'
 import {
   ArrowUpRight,
   Camera,
@@ -10,17 +10,21 @@ import {
   Play,
   X,
 } from 'lucide-react'
+import useMeasure from 'react-use-measure'
 
-// Links organised into three categories, picked with a dropdown.
-// The GitHub profile lives under Website so no link is lost.
+// Links organised into three categories, picked with a dropdown
+// disclosure in the pasted style (plain-CSS adaptation). The GitHub
+// profile lives under Website so no link is lost.
 //
-// NOTE: this used to be a shared-layout dropdown (layoutId spans,
-// AnimatePresence popLayout, measured width/height animation). On real
-// phones that machinery was flaky: tapping an option's TEXT left the
-// trigger pill blank (the shared-layout projection could end invisible),
-// while tapping the check circle worked. Plain conditional rendering
-// with a simple fade is the same look and cannot go blank — the whole
-// row is one button, so text, icon and circle all do the same thing.
+// NOTE: this is the v9 smooth animation (useMeasure + outer motion.div
+// width/height spring, AnimatePresence popLayout) with ONE fix: every
+// layoutId / layout="position" prop was removed. Those shared-layout
+// spans were the blank-pill bug — when a category was picked, the
+// trigger mounted with a layoutId whose source lived in the exiting
+// option row, and the shared-element projection could start from a
+// stale/zero box, rendering the icon + name invisible. Without
+// layoutId there is no projection anywhere in this file, so the
+// trigger can never go blank, and the spring animation is untouched.
 const categories = [
   {
     id: 'instagram',
@@ -105,6 +109,7 @@ const categories = [
 export default function LinkSelector() {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedId, setSelectedId] = useState('instagram')
+  const [ref, bounds] = useMeasure()
   const containerRef = useRef(null)
 
   const selected =
@@ -128,86 +133,105 @@ export default function LinkSelector() {
 
   return (
     <div className="links-selector-wrap">
-      <div ref={containerRef} className="link-selector">
-        <div className="link-selector-inner">
-          {!isOpen ? (
-            <button
-              type="button"
-              onClick={() => setIsOpen(true)}
-              className="link-selector-trigger"
-            >
-              <span className="link-selector-icon">
-                <SelectedIcon size={22} strokeWidth={1.75} />
-              </span>
-              <span className="link-selector-name">{selected.name}</span>
-              <span className="link-selector-chevron">
-                <ChevronDown size={24} />
-              </span>
-            </button>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="link-selector-expanded"
-            >
-              <div className="link-selector-head">
-                <span className="link-selector-title">Choose a category</span>
-                <button
+      <MotionConfig
+        transition={{ type: 'spring', stiffness: 200, damping: 25, mass: 1 }}
+      >
+        <motion.div
+          ref={containerRef}
+          animate={{
+            width: bounds.width > 0 ? bounds.width : 'auto',
+            height: bounds.height > 0 ? bounds.height : 'auto',
+          }}
+          className="link-selector"
+        >
+          <div ref={ref} className="link-selector-inner">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {!isOpen ? (
+                <motion.button
+                  key="trigger"
                   type="button"
-                  onClick={() => setIsOpen(false)}
-                  aria-label="Close menu"
-                  title="Close menu"
-                  className="link-selector-close"
+                  onClick={() => setIsOpen(true)}
+                  exit={{ opacity: 0, transition: { duration: 0 } }}
+                  className="link-selector-trigger"
                 >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="link-selector-options">
-                {categories.map((category) => {
-                  const active = category.id === selected.id
-                  const Icon = category.icon
-                  return (
+                  <span className="link-selector-icon">
+                    <SelectedIcon size={22} strokeWidth={1.75} />
+                  </span>
+                  <span className="link-selector-name">
+                    {selected.name}
+                  </span>
+                  <span className="link-selector-chevron">
+                    <ChevronDown size={24} />
+                  </span>
+                </motion.button>
+              ) : (
+                <motion.div
+                  key="expanded"
+                  exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                  className="link-selector-expanded"
+                >
+                  <div className="link-selector-head">
+                    <span className="link-selector-title">
+                      Choose a category
+                    </span>
                     <button
-                      key={category.id}
                       type="button"
-                      onClick={() => {
-                        setSelectedId(category.id)
-                        setIsOpen(false)
-                      }}
-                      className="link-selector-option"
+                      onClick={() => setIsOpen(false)}
+                      aria-label="Close menu"
+                      title="Close menu"
+                      className="link-selector-close"
                     >
-                      <span className="link-selector-option-left">
-                        <span className="link-selector-icon">
-                          <Icon size={22} strokeWidth={1.75} />
-                        </span>
-                        <span className="link-selector-option-text">
-                          <span className="link-selector-option-name">
-                            {category.name}
-                          </span>
-                          <span className="link-selector-option-desc">
-                            {category.description}
-                          </span>
-                        </span>
-                      </span>
-                      <span
-                        className={
-                          active
-                            ? 'link-selector-check link-selector-check-active'
-                            : 'link-selector-check'
-                        }
-                      >
-                        {active && <Check size={16} strokeWidth={3.5} />}
-                      </span>
+                      <X size={20} />
                     </button>
-                  )
-                })}
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </div>
+                  </div>
+
+                  <div className="link-selector-options">
+                    {categories.map((category) => {
+                      const active = category.id === selected.id
+                      const Icon = category.icon
+                      return (
+                        <motion.button
+                          key={category.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedId(category.id)
+                            setIsOpen(false)
+                          }}
+                          whileTap={{ scale: 0.97 }}
+                          className="link-selector-option"
+                        >
+                          <span className="link-selector-option-left">
+                            <span className="link-selector-icon">
+                              <Icon size={22} strokeWidth={1.75} />
+                            </span>
+                            <span className="link-selector-option-text">
+                              <span className="link-selector-option-name">
+                                {category.name}
+                              </span>
+                              <span className="link-selector-option-desc">
+                                {category.description}
+                              </span>
+                            </span>
+                          </span>
+                          <span
+                            className={
+                              active
+                                ? 'link-selector-check link-selector-check-active'
+                                : 'link-selector-check'
+                            }
+                          >
+                            {active && <Check size={16} strokeWidth={3.5} />}
+                          </span>
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </MotionConfig>
 
       <div className="links-list">
         {selected.links.map((link) => (
