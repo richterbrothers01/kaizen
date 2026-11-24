@@ -1,15 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { motion, useMotionValueEvent, useScroll, useSpring } from 'motion/react'
 import { loadB64Asset } from './loadB64.js'
 
-// Poster stays until the decoded video is ready to show. It lives as
-// base64 text in public/hero-poster.webp.b64 (snapshot push rejects
-// binaries) and is decoded to a Blob URL at runtime, same as the video.
-const B64_URL = `${import.meta.env.BASE_URL}hero-bg.mp4.b64`
+// Two background videos, one per page:
+// - Home ("/"): the new 10s video — 1280x720, 60fps, ~9.93s, 596 frames.
+// - Contact ("/contact"): the original 5s video — 60fps, ~3.93s, 236 frames.
+// Both live as base64 text in public/ (snapshot push rejects binaries)
+// and are decoded to Blob URLs at runtime, same as the poster.
+// Each page also has its own poster frame so the photo matches the video
+// underneath while the decoder primes.
+const VIDEO_FILES = {
+  home: 'hero-bg-home.mp4.b64',
+  contact: 'hero-bg.mp4.b64',
+}
+const POSTER_FILES = {
+  home: 'hero-poster-home.webp.b64',
+  contact: 'hero-poster.webp.b64',
+}
 
-// The video is 60fps (trimmed to start at the rain, ~3.93s, 236 frames).
-// Total frames are computed from the loaded metadata. Scroll maps to
-// frames in steps of 5: at the very bottom it wraps to frame 0 and replays.
+// The videos are 60fps. Total frames are computed from the loaded
+// metadata. Scroll maps to frames in steps of 5: at the very bottom it
+// wraps to frame 0 and replays.
 const FPS = 60
 const FRAME_STEP = 5
 
@@ -56,46 +68,77 @@ function frameIsVisible(video) {
 // visible, and (3) retry the prime on the user's first touch — a real tap
 // lifts autoplay blocks (low-power mode, data saver) that reject play()
 // on load. If the video never renders, the photo stays — never a black page.
+//
+// Route switching: the video and poster swap when the route changes
+// (home <-> contact). The old blob URLs stay alive until the new ones are
+// ready, so there is no black flash mid-swap; proof state resets per
+// video, and each prime is tagged with a session id so a prime started
+// for the old video can never mark the new one as proven.
 export default function VideoBackground() {
+  const { pathname } = useLocation()
+  const isContact = pathname === '/contact'
+  const videoFile = isContact ? VIDEO_FILES.contact : VIDEO_FILES.home
+  const posterFile = isContact ? POSTER_FILES.contact : POSTER_FILES.home
+
   const videoRef = useRef(null)
   const durationRef = useRef(0)
   const totalFramesRef = useRef(0)
   const provenRef = useRef(false)
-  const primingRef = useRef(false)
+  const primingRef = useRef(0)
+  const sessionRef = useRef(0)
+  const videoUrlRef = useRef(null)
+  const posterUrlRef = useRef(null)
   const [posterGone, setPosterGone] = useState(false)
   const [posterUrl, setPosterUrl] = useState(null)
 
-  // Load the poster photo from its base64 text asset, same pattern as
-  // the video below. Until it arrives the video shows its own first
-  // frame once decoded — the poster layer only renders once it exists.
+  // Load the poster photo for the current route from its base64 text
+  // asset. Until it arrives the previous poster's URL stays live, so the
+  // layer never goes blank mid-swap. The poster layer only renders once
+  // a URL exists.
   useEffect(() => {
     let cancelled = false
-    let objectUrl = null
-    loadB64Asset('hero-poster.webp.b64', 'image/webp')
+    setPosterGone(false)
+    loadB64Asset(posterFile, 'image/webp')
       .then((url) => {
-        if (!cancelled) {
-          objectUrl = url
-          setPosterUrl(url)
-        } else {
+        if (cancelled) {
           URL.revokeObjectURL(url)
+          return
         }
+        if (posterUrlRef.current) URL.revokeObjectURL(posterUrlRef.current)
+        posterUrlRef.current = url
+        setPosterUrl(url)
       })
       .catch(() => {
         // Poster stays missing — the video still works without it.
       })
     return () => {
       cancelled = true
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [posterFile])
+
+  // Revoke the live poster URL on unmount.
+  useEffect(() => {
+    return () => {
+      if (posterUrlRef.current) URL.revokeObjectURL(posterUrlRef.current)
     }
   }, [])
 
-  // Load the base64 asset, decode it to a Blob, and hand the video an
-  // object URL. The base64 string never goes into a JS bundle.
+  // Load the base64 asset for the current route, decode it to a Blob,
+  // and hand the video an object URL. The base64 string never goes into
+  // a JS bundle. The previous blob URL is revoked only after the new
+  // source is set, so the video never sits on a dead URL.
   useEffect(() => {
     let cancelled = false
-    let objectUrl = null
 
-    fetch(B64_URL)
+    // New video, new session: proof state resets and any prime still
+    // running for the old video is abandoned (session checks below).
+    sessionRef.current += 1
+    provenRef.current = false
+    durationRef.current = 0
+    totalFramesRef.current = 0
+    setPosterGone(false)
+
+    fetch(`${import.meta.env.BASE_URL}${videoFile}`)
       .then((res) => {
         if (!res.ok) throw new Error('video asset failed to load')
         return res.text()
@@ -105,12 +148,20 @@ export default function VideoBackground() {
         const bin = atob(clean)
         const bytes = new Uint8Array(bin.length)
         for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-        objectUrl = URL.createObjectURL(
+        const objectUrl = URL.createObjectURL(
           new Blob([bytes], { type: 'video/mp4' }),
         )
-        if (!cancelled) {
-          const video = videoRef.current
-          if (video) video.src = objectUrl
+        if (cancelled) {
+          URL.revokeObjectURL(objectUrl)
+          return
+        }
+        const video = videoRef.current
+        if (video) {
+          video.src = objectUrl
+          if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
+          videoUrlRef.current = objectUrl
+        } else {
+          URL.revokeObjectURL(objectUrl)
         }
       })
       .catch(() => {
@@ -119,7 +170,13 @@ export default function VideoBackground() {
 
     return () => {
       cancelled = true
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [videoFile])
+
+  // Revoke the live video URL on unmount.
+  useEffect(() => {
+    return () => {
+      if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
     }
   }, [])
 
@@ -146,11 +203,14 @@ export default function VideoBackground() {
 
   // Prime the decoder: play muted until one frame is genuinely presented,
   // then pause and seek to the scroll target. Hides the poster photo only
-  // once a real frame is proven on screen.
+  // once a real frame is proven on screen. Tagged with the current
+  // session so a stale prime (from the previous route's video) bails out
+  // instead of proving or pausing the new video.
   const primeVideo = async () => {
     const video = videoRef.current
-    if (!video || provenRef.current || primingRef.current) return
-    primingRef.current = true
+    const session = sessionRef.current
+    if (!video || provenRef.current || primingRef.current === session) return
+    primingRef.current = session
     try {
       const presented = await new Promise((resolve) => {
         let done = false
@@ -161,6 +221,11 @@ export default function VideoBackground() {
           }
         }
         const onFrame = () => {
+          // Stale callback from the previous video — ignore it.
+          if (session !== sessionRef.current) {
+            finish(false)
+            return
+          }
           try {
             video.pause()
           } catch {
@@ -180,6 +245,8 @@ export default function VideoBackground() {
         video.play().catch(() => finish(false))
       })
 
+      if (session !== sessionRef.current) return
+
       try {
         video.currentTime = steppedTime(
           scrollYProgress.get(),
@@ -198,6 +265,7 @@ export default function VideoBackground() {
       }
       // Otherwise keep checking the pixels — seeks may still render.
       for (let i = 0; i < 10; i++) {
+        if (session !== sessionRef.current) return
         if (frameIsVisible(video)) {
           provenRef.current = true
           setPosterGone(true)
@@ -215,7 +283,7 @@ export default function VideoBackground() {
       }
       // Still no proof after ~1.5s: leave the poster photo up. Never black.
     } finally {
-      primingRef.current = false
+      if (primingRef.current === session) primingRef.current = 0
     }
   }
 
@@ -252,6 +320,7 @@ export default function VideoBackground() {
           durationRef.current = duration
           // Round the frame count DOWN to a multiple of the step, so
           // progress 1 maps exactly back to frame 0 (replay).
+          // Home: 596 -> 595. Contact: 236 -> 235.
           totalFramesRef.current =
             Math.floor((duration * FPS) / FRAME_STEP) * FRAME_STEP
           // Seek to the current scroll position as soon as the video can
