@@ -1,80 +1,30 @@
-import { useState } from 'react'
-import { AnimatePresence } from 'motion/react'
-import Hero from './Hero.jsx'
+import { useEffect } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import VideoBackground from './VideoBackground.jsx'
-import About from './About.jsx'
-import WorkCards from './WorkCards.jsx'
-import ProjectModal from './ProjectModal.jsx'
-import LinkSelector from './LinkSelector.jsx'
-import { Reveal } from './Reveal.jsx'
+import HomePage from './HomePage.jsx'
+import ContactPage from './ContactPage.jsx'
+import { ToastProvider } from './Toast.jsx'
+
+// Back to the top on every route change, so a fresh page never opens
+// mid-scroll (and the video scrub restarts at frame 0).
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
 
 export default function App() {
-  const [modalIndex, setModalIndex] = useState(null)
-
   return (
-    <>
-      {/* Fixed, scroll-scrubbed video behind the whole page */}
+    <ToastProvider>
+      <ScrollToTop />
+      {/* Fixed, scroll-scrubbed video behind both pages */}
       <VideoBackground />
-
-      <main className="page">
-        <Hero />
-
-        <About />
-
-        <section id="work" className="section">
-          <Reveal delay={0}>
-            <p className="section-kicker">Work</p>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <h2 className="section-title">
-              Everything I&apos;ve forged so far.
-            </h2>
-          </Reveal>
-          <Reveal delay={0.16}>
-            <p className="section-sub">
-              Startups, built in public. Each one is a bet on a problem worth
-              solving. Tap a card to read its story.
-            </p>
-          </Reveal>
-
-          <WorkCards onOpen={setModalIndex} />
-        </section>
-
-        <section id="links" className="section">
-          <Reveal delay={0}>
-            <p className="section-kicker">Links</p>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <h2 className="section-title">Find me everywhere.</h2>
-          </Reveal>
-          <Reveal delay={0.16}>
-            <p className="section-sub">
-              Pick a category, then find me there.
-            </p>
-          </Reveal>
-
-          <LinkSelector />
-        </section>
-
-        <footer className="site-footer">
-          <Reveal delay={0}>
-            <p className="footer-brand">xforge.git</p>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="footer-tag">Forged, not found.</p>
-          </Reveal>
-        </footer>
-      </main>
-
-      <AnimatePresence>
-        {modalIndex !== null && (
-          <ProjectModal
-            index={modalIndex}
-            onIndexChange={setModalIndex}
-            onClose={() => setModalIndex(null)}
-          />
-        )}
-      </AnimatePresence>
-    </>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/contact" element={<ContactPage />} />
+      </Routes>
+    </ToastProvider>
   )
 }

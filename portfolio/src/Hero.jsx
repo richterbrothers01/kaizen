@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import { Link } from 'react-router-dom'
 import { ArrowDown } from 'lucide-react'
 import { Typewriter } from './Typewriter.jsx'
 
@@ -31,6 +32,9 @@ export default function Hero() {
             <a href="#links" className="hero-nav-link">
               Links
             </a>
+            <Link to="/contact" className="hero-nav-link">
+              Contact
+            </Link>
           </div>
         </motion.nav>
 
