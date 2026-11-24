@@ -2,17 +2,20 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, MotionConfig } from 'motion/react'
 import {
   ArrowUpRight,
+  AtSign,
   Camera,
   Check,
   ChevronDown,
   Compass,
   GitBranch,
+  Lightbulb,
+  MessagesSquare,
   Play,
   X,
 } from 'lucide-react'
 import useMeasure from 'react-use-measure'
 
-// Links organised into three categories, picked with a dropdown
+// Links organised into six categories, picked with a dropdown
 // disclosure in the pasted style (plain-CSS adaptation). The GitHub
 // profile lives under Website so no link is lost.
 //
@@ -36,19 +39,13 @@ const categories = [
         icon: Camera,
         label: 'Instagram',
         handle: '@xforge.git',
-        href: 'https://instagram.com/xforge.git',
-      },
-      {
-        icon: Camera,
-        label: 'Instagram',
-        handle: '@kaizenbrowser',
-        href: 'https://instagram.com/kaizenbrowser',
+        href: 'https://www.instagram.com/xforge.git',
       },
       {
         icon: Camera,
         label: 'Instagram',
         handle: '@northform_hq',
-        href: 'https://instagram.com/northform_hq',
+        href: 'https://www.instagram.com/northform_hq',
       },
     ],
   },
@@ -61,8 +58,8 @@ const categories = [
       {
         icon: Compass,
         label: 'Website',
-        handle: 'kaizenbrowser.vercel.app',
-        href: 'https://kaizenbrowser.vercel.app',
+        handle: 'xforgegit.vercel.app',
+        href: 'https://xforgegit.vercel.app',
       },
       {
         icon: Compass,
@@ -93,14 +90,56 @@ const categories = [
       {
         icon: Play,
         label: 'YouTube',
-        handle: '@kaizenbrowser',
-        href: 'https://www.youtube.com/@kaizenbrowser',
+        handle: '@xforge',
+        href: 'https://www.youtube.com/channel/UC2TcK9ziMZLuxGy4PWM7MIQ',
       },
       {
         icon: Play,
         label: 'YouTube',
         handle: 'NorthForm',
         href: 'https://www.youtube.com/channel/UCDjKwSw7avXo4Ow2cU6KsqA',
+      },
+    ],
+  },
+  {
+    id: 'reddit',
+    name: 'Reddit',
+    description: 'My Reddit posts',
+    icon: MessagesSquare,
+    links: [
+      {
+        icon: MessagesSquare,
+        label: 'Reddit',
+        handle: 'u/xforgegit',
+        href: 'https://www.reddit.com/user/xforgegit/',
+      },
+    ],
+  },
+  {
+    id: 'x',
+    name: 'X',
+    description: 'My posts on X',
+    icon: AtSign,
+    links: [
+      {
+        icon: AtSign,
+        label: 'X',
+        handle: '@xforgegit',
+        href: 'https://x.com/xforgegit',
+      },
+    ],
+  },
+  {
+    id: 'indiehackers',
+    name: 'Indie Hackers',
+    description: 'My Indie Hackers posts',
+    icon: Lightbulb,
+    links: [
+      {
+        icon: Lightbulb,
+        label: 'Indie Hackers',
+        handle: 'xforgegit',
+        href: 'https://www.indiehackers.com/xforgegit',
       },
     ],
   },

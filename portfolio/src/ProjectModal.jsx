@@ -11,6 +11,48 @@ import clsx from 'clsx'
 import { Typewriter } from './Typewriter.jsx'
 import { WordType } from './WordType.jsx'
 import { projects } from './projects.js'
+import { loadB64Asset } from './loadB64.js'
+
+// A project screenshot, loaded from its public/*.b64 text asset and shown
+// with the same blur-off/on entrance as the bio text: blurred on slide
+// enter, sharpening to clear. The panel remounts per slide (key={index}),
+// so this runs on every slide enter, exactly like the text.
+function ModalImage({ file, alt }) {
+  const [url, setUrl] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    let objectUrl = null
+    loadB64Asset(file, 'image/jpeg')
+      .then((u) => {
+        if (!cancelled) {
+          objectUrl = u
+          setUrl(u)
+        } else {
+          URL.revokeObjectURL(u)
+        }
+      })
+      .catch(() => {
+        // Image stays missing — the bio still reads without it.
+      })
+    return () => {
+      cancelled = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [file])
+
+  if (!url) return null
+  return (
+    <motion.img
+      src={url}
+      alt={alt}
+      className="modal-image"
+      initial={{ filter: 'blur(12px)', opacity: 0 }}
+      animate={{ filter: 'blur(0px)', opacity: 1 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+    />
+  )
+}
 
 // Carousel slide variants (from the pasted carousel style): the whole
 // card slides in with a tilt and a brightness flash, drags sideways, and
@@ -150,6 +192,14 @@ export default function ProjectModal({ index, onIndexChange, onClose }) {
                   <WordType text={section.text} stagger={0.015} />
                 </p>
               </div>
+            ))}
+
+            {(project.images || []).map((image) => (
+              <ModalImage
+                key={image.file}
+                file={image.file}
+                alt={image.alt}
+              />
             ))}
 
             {project.link && (

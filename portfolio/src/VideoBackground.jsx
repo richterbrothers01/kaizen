@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValueEvent, useScroll, useSpring } from 'motion/react'
+import { loadB64Asset } from './loadB64.js'
 
-// Poster stays until the decoded video is ready to show.
-const POSTER = 'https://kaizenbrowser.vercel.app/xforge-hero-bg.webp'
+// Poster stays until the decoded video is ready to show. It lives as
+// base64 text in public/hero-poster.webp.b64 (snapshot push rejects
+// binaries) and is decoded to a Blob URL at runtime, same as the video.
 const B64_URL = `${import.meta.env.BASE_URL}hero-bg.mp4.b64`
 
 // The video is 60fps (trimmed to start at the rain, ~3.93s, 236 frames).
@@ -61,6 +63,31 @@ export default function VideoBackground() {
   const provenRef = useRef(false)
   const primingRef = useRef(false)
   const [posterGone, setPosterGone] = useState(false)
+  const [posterUrl, setPosterUrl] = useState(null)
+
+  // Load the poster photo from its base64 text asset, same pattern as
+  // the video below. Until it arrives the video shows its own first
+  // frame once decoded — the poster layer only renders once it exists.
+  useEffect(() => {
+    let cancelled = false
+    let objectUrl = null
+    loadB64Asset('hero-poster.webp.b64', 'image/webp')
+      .then((url) => {
+        if (!cancelled) {
+          objectUrl = url
+          setPosterUrl(url)
+        } else {
+          URL.revokeObjectURL(url)
+        }
+      })
+      .catch(() => {
+        // Poster stays missing — the video still works without it.
+      })
+    return () => {
+      cancelled = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [])
 
   // Load the base64 asset, decode it to a Blob, and hand the video an
   // object URL. The base64 string never goes into a JS bundle.
@@ -215,7 +242,7 @@ export default function VideoBackground() {
       <video
         ref={videoRef}
         className="video-bg"
-        poster={POSTER}
+        poster={posterUrl || undefined}
         muted
         playsInline
         preload="auto"
@@ -245,12 +272,14 @@ export default function VideoBackground() {
       {/* Poster photo over the video until a real frame is proven visible.
           On phones the video stays black until it has played once — this
           layer is what stops the page ever being a black screen. */}
-      <img
-        className={posterGone ? 'video-bg-poster gone' : 'video-bg-poster'}
-        src={POSTER}
-        alt=""
-        aria-hidden="true"
-      />
+      {posterUrl && (
+        <img
+          className={posterGone ? 'video-bg-poster gone' : 'video-bg-poster'}
+          src={posterUrl}
+          alt=""
+          aria-hidden="true"
+        />
+      )}
       {/* Uniform dim so text stays readable over the video everywhere */}
       <div className="video-bg-dim" />
     </motion.div>

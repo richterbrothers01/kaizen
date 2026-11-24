@@ -52,7 +52,7 @@ export default function Hero() {
 
             <p className="hero-desc">
               <Typewriter
-                text="Every startup I build, in one place. Kaizen, NorthForm, and whatever I forge next."
+                text="Every startup I build, in one place. NorthForm, LearnMate, and whatever I forge next."
                 delay={1450}
                 speed={16}
               />

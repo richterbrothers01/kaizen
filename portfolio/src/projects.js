@@ -1,34 +1,8 @@
 // The three projects. Verified facts only — nothing invented, no numbers
-// made up. Accents: Kaizen gold, NorthForm cyan, LearnMate mint.
+// made up. Accents: NorthForm cyan, LearnMate mint, Coming soon violet.
+// Images live as base64 text in public/ (snapshot push rejects binaries)
+// and are decoded to Blob URLs at runtime — see loadB64.js.
 export const projects = [
-  {
-    id: 'kaizen',
-    name: 'Kaizen',
-    tag: 'Live project',
-    status: 'Pre-launch · waitlist open',
-    desc: 'A browser for founders that gives answers instead of links.',
-    link: 'https://kaizenbrowser.vercel.app',
-    linkLabel: 'kaizenbrowser.vercel.app',
-    accent: '#f2b33d',
-    accent2: '#fb923c',
-    accent3: '#fb7185',
-    glow: 'rgba(242, 179, 61, 0.15)',
-    soft: 'rgba(242, 179, 61, 0.12)',
-    sections: [
-      {
-        heading: 'How it was made',
-        text: 'First built as a React and Vite clickable demo with motion animations — the tab bar, the address bar, the sidebar, the new tab page with its ask bar, and the answer screen. The real product is a Chromium-based browser for founders, built by restyling Chrome black-and-grey minimal, with the Kaizen logo and name. The guidance feature comes first as a Chrome extension with hardcoded routes: on a task page, everything except the task greys out, and a side panel shows what to click next, what not to click, what happens after, and the next step. No Kaizen AI in the first version — the answer engine comes later.',
-      },
-      {
-        heading: 'Why it was made',
-        text: 'I drown in 30 tabs a day and wanted a browser that gives the answer, the pros and cons, and the exact next step instead of links. Every search ends in a pile of tabs and zero steps taken, so Kaizen is built around one idea: the search ends, the route begins. It is for founders, entrepreneurs and traders who would rather build than browse.',
-      },
-      {
-        heading: 'Where it stands',
-        text: 'Pre-launch, waitlist open. Three reels a day since 10 November, building in public on Instagram, YouTube, X and Indie Hackers. The React demo is private. The browser build is on hold while I pick the next SaaS — the extension comes first, and the kill test is simple: give it to ten real founders, and if nobody uses it a second time, it gets dropped.',
-      },
-    ],
-  },
   {
     id: 'northform',
     name: 'NorthForm',
@@ -42,6 +16,16 @@ export const projects = [
     accent3: '#818cf8',
     glow: 'rgba(56, 225, 255, 0.15)',
     soft: 'rgba(56, 225, 255, 0.12)',
+    images: [
+      {
+        file: 'northform-ig.jpg.b64',
+        alt: 'NorthForm Instagram profile (@northform_hq)',
+      },
+      {
+        file: 'northform-site.jpg.b64',
+        alt: 'NorthForm website homepage',
+      },
+    ],
     sections: [
       {
         heading: 'How it was made',
@@ -70,6 +54,12 @@ export const projects = [
     accent3: '#22d3ee',
     glow: 'rgba(61, 255, 168, 0.15)',
     soft: 'rgba(61, 255, 168, 0.12)',
+    images: [
+      {
+        file: 'learnmate-dashboard.jpg.b64',
+        alt: 'LearnMate dashboard',
+      },
+    ],
     sections: [
       {
         heading: 'How it was made',
@@ -82,6 +72,27 @@ export const projects = [
       {
         heading: 'Where it stands',
         text: 'In progress. The dashboard with courses and the AI Doubt Clearer is built, and the tests, quizzes and milestone path are the current work, built on the shared question bank. Live at learnmateit.vercel.app.',
+      },
+    ],
+  },
+  {
+    id: 'comingsoon',
+    name: 'Coming soon',
+    tag: 'Next up',
+    status: 'Still deciding',
+    desc: "A SaaS I'm still deciding on.",
+    link: null,
+    linkLabel: null,
+    accent: '#c084fc',
+    accent2: '#a78bfa',
+    accent3: '#f0abfc',
+    glow: 'rgba(192, 132, 252, 0.15)',
+    soft: 'rgba(192, 132, 252, 0.12)',
+    images: [],
+    sections: [
+      {
+        heading: 'Where it stands',
+        text: "I'm building a SaaS right now. I haven't decided what it is yet, or how I'm going to build it.",
       },
     ],
   },
