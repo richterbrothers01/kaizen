@@ -15,9 +15,8 @@ import {
 } from 'lucide-react'
 import useMeasure from 'react-use-measure'
 
-// Links organised into six categories, picked with a dropdown
-// disclosure in the pasted style (plain-CSS adaptation). The GitHub
-// profile lives under Website so no link is lost.
+// Links organised into seven categories, picked with a dropdown
+// disclosure in the pasted style (plain-CSS adaptation).
 //
 // NOTE: this is the v9 smooth animation (useMeasure + outer motion.div
 // width/height spring, AnimatePresence popLayout) with ONE fix: every
@@ -73,6 +72,14 @@ const categories = [
         handle: 'learnmateit.vercel.app',
         href: 'https://learnmateit.vercel.app',
       },
+    ],
+  },
+  {
+    id: 'github',
+    name: 'GitHub',
+    description: 'My code on GitHub',
+    icon: GitBranch,
+    links: [
       {
         icon: GitBranch,
         label: 'GitHub',
