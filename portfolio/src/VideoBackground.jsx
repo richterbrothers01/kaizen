@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { motion, useMotionValueEvent, useScroll, useSpring } from 'motion/react'
+import { motion, useMotionValueEvent, useScroll } from 'motion/react'
 import { loadB64Asset } from './loadB64.js'
 
 // Two background videos, one per page:
@@ -55,7 +55,10 @@ function frameIsVisible(video) {
 
 // The video is a FIXED full-screen background for the entire page. It never
 // scrolls away and never plays on a timer — scrolling scrubs it frame by
-// frame, smoothed by a spring so it feels buttery instead of jumpy.
+// frame, driven directly by the scroll position so the frame follows the
+// finger immediately. (An earlier version ran progress through a motion
+// spring first; the spring's ~1-2s settle made the video trail the scroll
+// badly on phones, so the spring is gone.)
 //
 // Mobile reality: phones will not render a frame of a video that has never
 // played — a scrubbed-only video stays black, and once the video loads the
@@ -67,7 +70,10 @@ function frameIsVisible(video) {
 // the poster photo layered over the video until a real frame is proven
 // visible, and (3) retry the prime on the user's first touch — a real tap
 // lifts autoplay blocks (low-power mode, data saver) that reject play()
-// on load. If the video never renders, the photo stays — never a black page.
+// on load. (4) every scroll re-checks the pixels and retries the prime
+// (throttled) while the poster is still up, so a failed prime on load
+// can never leave the poster stuck over a working video. If the video
+// never renders, the photo stays — never a black page.
 //
 // Route switching: the video and poster swap when the route changes
 // (home <-> contact). The old blob URLs stay alive until the new ones are
@@ -180,15 +186,14 @@ export default function VideoBackground() {
     }
   }, [])
 
-  // Page scroll progress, spring-smoothed for buttery scrubbing.
+  // Page scroll progress. The scrub is driven DIRECTLY by the raw scroll
+  // progress — no spring in between. A spring (stiffness 120 / damping 30 /
+  // mass 0.4) used to sit here and took ~1-2s to settle, so the video
+  // always trailed the finger by a second or more on phones.
   const { scrollYProgress } = useScroll()
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    mass: 0.4,
-  })
+  const lastPrimeRetryRef = useRef(0)
 
-  useMotionValueEvent(smoothProgress, 'change', (v) => {
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
     const video = videoRef.current
     if (!video || !durationRef.current || video.readyState < 1) return
     const target = steppedTime(v, totalFramesRef.current)
@@ -197,6 +202,24 @@ export default function VideoBackground() {
         video.currentTime = target
       } catch {
         // Seeking can throw while the video is still settling — ignore it.
+      }
+    }
+    // The poster only hides once a real frame is proven visible. The
+    // prime-on-load can fail on a real phone (autoplay blocked) and its
+    // 1.5s pixel-check loop can give up, leaving the poster stuck over a
+    // video that is scrubbing fine underneath — which looks like the video
+    // is not playing at all. So every scroll also re-checks the pixels:
+    // the moment a frame is genuinely on screen, the poster goes. And
+    // while still unproven, retry the prime on scroll (throttled) — a
+    // scroll is a real user gesture, like the pointerdown retry below,
+    // and it lifts the same autoplay blocks.
+    if (!provenRef.current) {
+      if (frameIsVisible(video)) {
+        provenRef.current = true
+        setPosterGone(true)
+      } else if (Date.now() - lastPrimeRetryRef.current > 800) {
+        lastPrimeRetryRef.current = Date.now()
+        primeVideo()
       }
     }
   })
